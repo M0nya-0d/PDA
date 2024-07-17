@@ -5,7 +5,7 @@ inc = int(file.read())
 file.close()
 print(inc)
 while True:
-    if(inc == 1):
+    if(inc == '1'):
         file = open('inc.txt', 'w', encoding='utf-8')
         file.write('55')
         file.close()
