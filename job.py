@@ -1,4 +1,4 @@
 #Job
 import os
 while True:
-    ios.system('python3 test.py')
+    os.system('python3 test.py')
