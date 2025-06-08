@@ -1,7 +1,7 @@
 import serial
 
 # UART порт и скорость (Проверь свою скорость!)
-serial_port = "/dev/ttyS1"
+serial_port = "/dev/ttyS5"
 baud_rate = 9600  # или 115200 — какая стоит в твоем Nextion!
 
 try:

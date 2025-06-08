@@ -1,7 +1,7 @@
 import serial
 import time
 
-serial_port = "/dev/ttyS1"  # UART1 на Orange Pi Zero 3
+serial_port = "/dev/ttyS5"  # UART1 на Orange Pi Zero 3
 baud_rate = 9600  # или 115200 — смотри сам
 
 try:
