@@ -21,7 +21,7 @@ echo "🌐 Версия в репозитории: $REMOTE_VERSION"
 if [ "$LOCAL_VERSION" != "$REMOTE_VERSION" ]; then
     echo "⬇️ Обнаружено обновление, выполняется git pull..."
     git -C "$REPO_DIR" reset --hard HEAD
-    git -C "$REPO_DIR" pull origin main
+    git -C "$REPO_DIR" pull origin master
 
     echo "🔄 Перезапуск обновлённого скрипта..."
     exec /bin/bash "$REPO_DIR/update_pda.sh"
