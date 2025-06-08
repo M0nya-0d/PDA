@@ -1,7 +1,7 @@
 #!/bin/bash
 
 REPO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-REPO_URL="https://raw.githubusercontent.com/M0nya-0d/PDA/main/vers.txt"
+REPO_URL="https://raw.githubusercontent.com/M0nya-0d/PDA/master/vers.txt"
 LOCAL_VER_FILE="$REPO_DIR/vers.txt"
 
 echo "🔁 Проверка обновлений..."
