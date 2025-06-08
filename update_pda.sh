@@ -23,7 +23,7 @@ if [ "$LOCAL_VERSION" != "$REMOTE_VERSION" ]; then
     git -C "$REPO_DIR" reset --hard HEAD
     git -C "$REPO_DIR" pull origin master
     
-    chmod +x "$REPO_DIR/update_pda.sh"
+    chmod +x "/home/monya/PDA/update_pda.sh"
     chmod +x "$REPO_DIR/stall/flash_nextion.py"
 
     echo "🔄 Перезапуск обновлённого скрипта..."

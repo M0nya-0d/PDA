@@ -6,7 +6,7 @@ import sys
 # === НАСТРОЙКИ ===
 
 # Путь к файлу прошивки
-tft_path = "/home/orangepi/PDA/stall/displey_pda.tft"
+tft_path = "/home/monya/PDA/stall/displey_pda.tft"
 
 # UART порт (PH2/PH3 → UART1 → /dev/ttyS1)
 serial_port = "/dev/ttyS1"
