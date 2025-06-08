@@ -3,7 +3,7 @@ import time
 import os
 
 # Путь к tft файлу
-tft_path = "/home/orangepi/stall/displey_pda.tft"
+tft_path = "/home/orangepi/PDA/stall/displey_pda.tft"
 
 # Последовательный порт и скорость
 serial_port = "/dev/ttyS1"  # это PH2/PH3 (UART1) на Orange Pi Zero 3
