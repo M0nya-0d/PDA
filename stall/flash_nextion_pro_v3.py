@@ -7,7 +7,7 @@ import sys
 
 tft_path = "/home/orangepi/PDA/stall/displey_pda.tft"
 serial_port = "/dev/ttyS5"
-baud_rate = 9600  # или 115200
+baud_rate = 115200  # ВАЖНО — 115200 лучше для прошивки!
 
 # === ПРОВЕРКИ ===
 
@@ -35,16 +35,16 @@ input("➡️ Теперь ВКЛЮЧИ питание дисплея и наж�
 # === ЖДЁМ ГОТОВНОСТИ ===
 
 while True:
-    # Шаг 1: Посылаем \xFF\xFF\xFF
+    # Сбрасываем мусор
     ser.write(b'\xFF\xFF\xFF')
     time.sleep(0.1)
 
-    # Шаг 2: "магическая строка"
+    # Магическая строка
     ser.write(b'DRAKJHSUYDGBNCJHGJKSHBDN' + b'\xFF\xFF\xFF')
     print("➡️ Отправил 'магическую строку' для сброса режима.")
     time.sleep(0.5)
 
-    # Шаг 3: Посылаем connect
+    # Посылаем connect
     ser.write(b'connect' + b'\xFF\xFF\xFF')
     print("➡️ Отправил 'connect'.")
 
@@ -61,13 +61,27 @@ while True:
         print("🔄 Дисплей НЕ ответил на 'connect' — повтор через 1 сек...")
         time.sleep(1)
 
+# === ОТКЛЮЧАЕМ СОН / ДИММЕР ===
+
+print("➡️ Отключаю режим сна и диммера...")
+ser.write(b'sleep=0' + b'\xFF\xFF\xFF')
+time.sleep(0.1)
+ser.write(b'dims=100' + b'\xFF\xFF\xFF')
+time.sleep(0.1)
+
+# === СБРАСЫВАЕМ БУФЕРЫ ===
+
+ser.reset_input_buffer()
+ser.reset_output_buffer()
+
 # === ПОСЫЛАЕМ КОМАНДУ ПРОШИВКИ ===
 
-cmd = f'whmi-wri {file_size},{baud_rate},0\r'.encode('ascii') + b'\xFF\xFF\xFF'
+cmd = f'whmi-wri {file_size},{baud_rate},0'.encode('ascii') + b'\x79\x79\x79' + b'\xFF\xFF\xFF'
 print(f"➡️ Отправляю команду прошивки: {cmd}")
+time.sleep(0.2)
 ser.write(cmd)
 
-# Читаем ответ (на команду whmi-wri дисплей должен ответить 05 00 00 FF FF FF)
+# Ждём ответ
 time.sleep(1)
 response = ser.read(6)
 print(f"⬅️ Ответ дисплея на whmi-wri: {response.hex()}")
