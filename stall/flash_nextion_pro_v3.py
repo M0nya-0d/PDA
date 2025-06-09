@@ -7,7 +7,7 @@ import sys
 
 tft_path = "/home/orangepi/PDA/stall/displey_pda.tft"
 serial_port = "/dev/ttyS5"
-baud_rates = [115200, 57600, 38400, 19200, 9600]  # Попробуем все скорости
+baud_rate = 9600  # По Habr рекомендуется 115200 для прошивки
 
 # === ПРОВЕРКИ ===
 
@@ -18,78 +18,56 @@ if not os.path.exists(tft_path):
 file_size = os.path.getsize(tft_path)
 print(f"📄 Размер файла: {file_size} байт")
 
+# === ОТКРЫВАЕМ ПОРТ ===
+
+try:
+    ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=2)
+    print(f"✅ Открыт порт {serial_port} @ {baud_rate} baud")
+except Exception as e:
+    print(f"❌ Ошибка открытия порта {serial_port}: {e}")
+    sys.exit(1)
+
 # === ОТКЛЮЧЕНИЕ / ВКЛЮЧЕНИЕ ДИСПЛЕЯ ===
 
 print("⚠️ ОТКЛЮЧИТЕ питание дисплея! Потом нажмите Enter.")
 input("➡️ Теперь ВКЛЮЧИ питание дисплея и нажми Enter...")
 
-# === ПОИСК РАБОЧЕЙ СКОРОСТИ ===
+# === ПРЕДВАРИТЕЛЬНЫЙ СБРОС ===
 
-found_baud = None
+ser.write(b'\xFF\xFF\xFF')
+time.sleep(0.1)
+ser.reset_input_buffer()
+ser.reset_output_buffer()
 
-for baud_rate in baud_rates:
-    print(f"\n🔄 Пробуем скорость {baud_rate} baud...")
+# === ЦИКЛ ОЖИДАНИЯ ГОТОВНОСТИ ===
 
-    try:
-        ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=2)
-        print(f"✅ Открыт порт {serial_port} @ {baud_rate} baud")
-    except Exception as e:
-        print(f"❌ Ошибка открытия порта {serial_port}: {e}")
-        continue
+while True:
+    # 1️⃣ Отправляем магическую строку
+    ser.write(b'DRAKJHSUYDGBNCJHGJKSHBDN' + b'\xFF\xFF\xFF')
+    print("➡️ Отправил 'магическую строку' для сброса режима.")
 
-    # ПРЕДВАРИТЕЛЬНЫЙ СБРОС
-    ser.write(b'\xFF\xFF\xFF')
-    time.sleep(0.1)
+    # 2️⃣ ВАЖНО! Ждём 2.0 сек (по Habr)
+    time.sleep(2.0)
+
+    # 3️⃣ Сбросим input buffer
     ser.reset_input_buffer()
-    ser.reset_output_buffer()
 
-    # ЦИКЛ ОЖИДАНИЯ ГОТОВНОСТИ
+    # 4️⃣ Отправляем connect
+    ser.write(b'connect' + b'\xFF\xFF\xFF')
+    print("➡️ Отправил 'connect'.")
 
-    for attempt in range(3):
-        print(f"🔁 Попытка {attempt + 1} на скорости {baud_rate}:")
+    # 5️⃣ Ждём ответ
+    time.sleep(1.5)
+    response = ser.read(64)
+    print(f"⬅️ Ответ дисплея: {response}")
 
-        # Магическая строка
-        ser.write(b'DRAKJHSUYDGBNCJHGJKSHBDN' + b'\xFF\xFF\xFF')
-        print("➡️ Отправил 'магическую строку' для сброса режима.")
-
-        # ВАЖНО! Ждём 2.0 сек (по Habr)
-        time.sleep(2.0)
-
-        # Сбросим input buffer
-        ser.reset_input_buffer()
-
-        # Отправляем connect
-        ser.write(b'connect' + b'\xFF\xFF\xFF')
-        print("➡️ Отправил 'connect'.")
-
-        # Ждём ответ
-        time.sleep(1.5)
-        response = ser.read(64)
-        print(f"⬅️ Ответ дисплея: {response}")
-
-        # Проверяем есть ли 'comok' в ответе
-        if b'comok' in response:
-            print(f"✅ Дисплей ГОТОВ к прошивке на {baud_rate} baud!")
-            found_baud = baud_rate
-            break
-        else:
-            print("🔄 Дисплей НЕ ответил на 'connect' — повтор...")
-
-    ser.close()
-
-    if found_baud:
+    # Проверяем есть ли 'comok' в ответе
+    if b'comok' in response:
+        print("✅ Дисплей ГОТОВ к прошивке!")
         break
-
-# === ЕСЛИ НЕ НАШЛИ — ВЫХОД ===
-
-if not found_baud:
-    print("❌ Не удалось установить связь с дисплеем на доступных скоростях!")
-    sys.exit(1)
-
-# === ПОВТОРНО ОТКРЫВАЕМ ПОРТ НА РАБОЧЕЙ СКОРОСТИ ===
-
-ser = serial.Serial(serial_port, baudrate=found_baud, timeout=2)
-print(f"\n✅ Открыт порт {serial_port} @ {found_baud} baud для прошивки")
+    else:
+        print("🔄 Дисплей НЕ ответил на 'connect' — повтор через 1 сек...")
+        time.sleep(1)
 
 # === ОТКЛЮЧАЕМ СОН / ДИММЕР ===
 
@@ -106,7 +84,7 @@ ser.reset_output_buffer()
 
 # === ПОСЫЛАЕМ КОМАНДУ ПРОШИВКИ ===
 
-cmd = f'whmi-wri {file_size},{found_baud},0'.encode('ascii') + b'\x79\x79\x79' + b'\xFF\xFF\xFF'
+cmd = f'whmi-wri {file_size},{baud_rate},0'.encode('ascii') + b'\x79\x79\x79' + b'\xFF\xFF\xFF'
 print(f"➡️ Отправляю команду прошивки: {cmd}")
 ser.write(cmd)
 
