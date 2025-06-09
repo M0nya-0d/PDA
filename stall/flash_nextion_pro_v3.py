@@ -7,7 +7,7 @@ import sys
 
 tft_path = "/home/orangepi/PDA/stall/displey_pda.tft"
 serial_port = "/dev/ttyS5"
-baud_rate = 115200  # ВАЖНО — 115200 лучше для прошивки!
+baud_rate = 115200  # Рекомендуемая скорость для прошивки!
 
 # === ПРОВЕРКИ ===
 
@@ -42,9 +42,14 @@ while True:
     # Магическая строка
     ser.write(b'DRAKJHSUYDGBNCJHGJKSHBDN' + b'\xFF\xFF\xFF')
     print("➡️ Отправил 'магическую строку' для сброса режима.")
-    time.sleep(0.5)
 
-    # Посылаем connect
+    # Ждём подольше чтобы дисплей успел сброситься
+    time.sleep(1.0)
+
+    # Сбрасываем input buffer — чтобы убрать лишние \x00
+    ser.reset_input_buffer()
+
+    # Отправляем connect
     ser.write(b'connect' + b'\xFF\xFF\xFF')
     print("➡️ Отправил 'connect'.")
 
