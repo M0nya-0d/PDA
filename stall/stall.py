@@ -17,6 +17,7 @@ def int_write(addr, num):
         ser.write(packet)
 
 def update_hp_rd(HP, RD):
+    orig_HP, orig_RD = HP, RD
     if 0 < RD < 4000:
         RD -= 1
         if HP < 10000:
@@ -31,7 +32,8 @@ def update_hp_rd(HP, RD):
         HP -= 20
         if HP < 0:
             HP = 0
-    return HP, RD
+    changed = (HP != orig_HP) or (RD != orig_RD)
+    return HP, RD, changed
 
 def load_params(filename):
     with open(filename, "r") as f:
@@ -48,25 +50,31 @@ def main():
     RD = params["RD"]
 
     last_update = time.monotonic()
-    cycle_counter = 0
+    save_counter = 0
+    need_save = False
 
     while True:
         now = time.monotonic()
         if now - last_update >= 1.0:
             last_update = now
-            HP, RD = update_hp_rd(HP, RD)
+            HP, RD, changed = update_hp_rd(HP, RD)
             int_write(0x5000, HP)
             int_write(0x5001, RD)
             print(f'HP = {HP}, RD = {RD}')
 
-            # Каждые 60 циклов (1 минута)
-            cycle_counter += 1
-            if cycle_counter >= 60:
-                cycle_counter = 0
-                params["HP"] = HP
-                params["RD"] = RD
-                save_params("param.json", params)
-                print("Сохранено в param.json")
+            # Если были изменения — запускаем счетчик, иначе сбрасываем
+            if changed:
+                need_save = True
+                save_counter += 1
+                if save_counter >= 60:
+                    save_counter = 0
+                    params["HP"] = HP
+                    params["RD"] = RD
+                    save_params("param.json", params)
+                    print("Сохранено в param.json после изменений")
+            else:
+                save_counter = 0
+                need_save = False
 
         time.sleep(0.01)
 
