@@ -36,14 +36,20 @@ def update_hp_rd(HP, RD):
 def load_params(filename):
     with open(filename, "r") as f:
         data = json.load(f)
-    return data["HP"], data["RD"]
+    return data
+
+def save_params(filename, data):
+    with open(filename, "w") as f:
+        json.dump(data, f, indent=4)
 
 def main():
-    # Загружаем стартовые параметры из файла
-    HP, RD = load_params("param.json")
-    print(f"Стартовые значения: HP = {HP}, RD = {RD}")
+    params = load_params("param.json")
+    HP = params["HP"]
+    RD = params["RD"]
 
     last_update = time.monotonic()
+    cycle_counter = 0
+
     while True:
         now = time.monotonic()
         if now - last_update >= 1.0:
@@ -52,7 +58,16 @@ def main():
             int_write(0x5000, HP)
             int_write(0x5001, RD)
             print(f'HP = {HP}, RD = {RD}')
-        # Здесь могут быть другие задачи
+
+            # Каждые 60 циклов (1 минута)
+            cycle_counter += 1
+            if cycle_counter >= 60:
+                cycle_counter = 0
+                params["HP"] = HP
+                params["RD"] = RD
+                save_params("param.json", params)
+                print("Сохранено в param.json")
+
         time.sleep(0.01)
 
 if __name__ == "__main__":
