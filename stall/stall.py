@@ -18,7 +18,7 @@ def int_write(addr, num):
         ser.write(packet)
 
 def send_text(addr, text):
-    text_bytes = text.encode("ascii") + b'\x00'
+    text_bytes = text.encode("ascii")
     length = 3 + len(text_bytes)
     packet = bytearray([
         0x5A, 0xA5,
@@ -26,6 +26,7 @@ def send_text(addr, text):
         0x82,
         (addr >> 8) & 0xFF, addr & 0xFF
     ]) + text_bytes
+    print("Отправляется пакет:", packet.hex())
     with serial.Serial(serial_port, baud_rate, timeout=1) as ser:
         ser.write(packet)
 
