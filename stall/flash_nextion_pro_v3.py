@@ -7,7 +7,7 @@ import sys
 
 tft_path = "/home/orangepi/PDA/stall/displey_pda.tft"
 serial_port = "/dev/ttyS5"
-baud_rate = 9600  # По Habr рекомендуется 115200 для прошивки
+baud_rate = 9600  # [115200, 57600, 38400, 19200, 9600]
 
 # === ПРОВЕРКИ ===
 
