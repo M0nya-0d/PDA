@@ -17,7 +17,10 @@ def int_write(addr, num):
     with serial.Serial(serial_port, baud_rate, timeout=1) as ser:
         ser.write(packet)
 
+TEXT_LENGTH = 7  # или сколько в настройках DWIN
+
 def send_text(addr, text):
+    text = text.ljust(TEXT_LENGTH)
     text_bytes = text.encode("ascii")
     length = 3 + len(text_bytes)
     packet = bytearray([
