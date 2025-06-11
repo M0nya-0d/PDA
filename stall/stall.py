@@ -4,6 +4,7 @@ import json
 
 serial_port = "/dev/ttyS5"
 baud_rate = 115200
+VERS_PATH = "/home/orangepi/PDA/vers.txt"
 
 def int_write(addr, num):
     packet = bytearray([
@@ -16,14 +17,31 @@ def int_write(addr, num):
     with serial.Serial(serial_port, baud_rate, timeout=1) as ser:
         ser.write(packet)
 
+def send_text(addr, text):
+    text_bytes = text.encode("ascii") + b'\x00'
+    length = 3 + len(text_bytes)
+    packet = bytearray([
+        0x5A, 0xA5,
+        length,
+        0x82,
+        (addr >> 8) & 0xFF, addr & 0xFF
+    ]) + text_bytes
+    with serial.Serial(serial_port, baud_rate, timeout=1) as ser:
+        ser.write(packet)
+
 def update_hp_rd(HP, RD):
     orig_HP, orig_RD = HP, RD
-    if 0 < RD < 4000:
+    if RD > 0 and RD <= 1000:
         RD -= 1
         if HP < 10000:
             HP += 1
+    elif 1000 < RD < 7000:
+        RD -= 1
     elif 4000 < RD < 7000:
         RD -= 1
+        HP -= 1
+        if HP <0:
+            HP = 0
     elif 7000 < RD < 8000:
         HP -= 10
         if HP < 0:
@@ -45,6 +63,10 @@ def save_params(filename, data):
         json.dump(data, f, indent=4)
 
 def main():
+    with open(VERS_PATH, "r") as f:
+        version = f.read().strip()
+    print(f"Версия программы: {version}")
+    send_text(0x5999, version)
     params = load_params("param.json")
     HP = params["HP"]
     RD = params["RD"]
