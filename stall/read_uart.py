@@ -12,11 +12,15 @@ def parse_dwin_packets(buffer):
             end_idx = i + 3 + plen - 1
             if end_idx < len(buffer):
                 packet = buffer[i:end_idx+1]
-                print(f"➡️ DWIN-пакет: {packet.hex()}")
-                # Проверим VP
-                if len(packet) >= 7 and packet[4] == 0x56 and packet[5] == 0x00:
+                print(f"➡️ DWIN-пакет ({len(packet)} байт): {packet.hex()}")
+                # Краткий разбор пакета:
+                if len(packet) >= 7:
+                    # VP (адрес переменной):
+                    vp_hi = packet[4]
+                    vp_lo = packet[5]
+                    vp = (vp_hi << 8) | vp_lo
                     value = packet[6]
-                    print(f"BitButton VP=0x5600 значение: {value}")
+                    print(f"  VP = 0x{vp:04X}  Значение: {value}")
                 i = end_idx + 1
             else:
                 break
