@@ -2,7 +2,7 @@ import serial
 import time
 
 serial_port = "/dev/ttyS5"  # UART1 на Orange Pi Zero 3
-baud_rate = 9600  # или 115200 — смотри сам
+baud_rate = 19200  # или 115200 — смотри сам
 
 try:
     ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=1)
@@ -20,7 +20,7 @@ try:
 
         # Читаем ответ
         time.sleep(0.1)  # небольшая пауза
-        incoming = ser.read(ser.in_waiting or 1)
+        incoming[] = ser.read(ser.in_waiting or 1)
         if incoming:
             print(f"⬅️ Получено: {incoming.decode(errors='ignore').strip()}")
 
