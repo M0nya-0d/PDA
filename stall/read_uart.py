@@ -13,47 +13,48 @@ def parse_dwin_packets(buffer):
             if end_idx < len(buffer):
                 packet = buffer[i:end_idx+1]
                 print(f"➡️ DWIN-пакет ({len(packet)} байт): {packet.hex()}")
-                # Краткий разбор пакета:
-                if len(packet) >= 7:
-                    # VP (адрес переменной):
-                    vp_hi = packet[4]
-                    vp_lo = packet[5]
-                    vp = (vp_hi << 8) | vp_lo
-                    value = packet[6]
+                if len(packet) >= 8:
+                    vp = (packet[4] << 8) | packet[5]
+                    value = packet[6] + (packet[7] << 8)
                     print(f"  VP = 0x{vp:04X}  Значение: {value}")
+                else:
+                    print("  Пакет слишком короткий для 2-байтового значения!")
                 i = end_idx + 1
             else:
                 break
         else:
             i += 1
 
-try:
-    ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=0.01)
-    print(f"📡 Чтение {serial_port} @ {baud_rate} бод... (нажмите Ctrl+C для выхода)")
+def hexstr_to_bytes(hexstr):
+    # Удаляем пробелы и переводим в байты
+    hexstr = hexstr.replace(' ', '')
+    return bytes.fromhex(hexstr)
 
-    buffer = b''
-    last_time = time.time()
-
-    while True:
-        data = ser.read(128)
-        if data:
-            buffer += data
-            last_time = time.time()
-        # Разбираем буфер, если прошло больше 50 мс без новых данных
-        if buffer and (time.time() - last_time > 0.05):
-            print(f"Получено ({len(buffer)} байт): {buffer.hex()} | {buffer}")
-            # Разбор DWIN-пакетов из буфера
-            parse_dwin_packets(buffer)
-            buffer = b''
-        time.sleep(0.01)
-
-except serial.SerialException as e:
-    print(f"❌ Ошибка открытия порта {serial_port}: {e}")
-
-except KeyboardInterrupt:
-    print("\n🛑 Завершено пользователем.")
-finally:
+def main():
     try:
-        ser.close()
-    except:
-        pass
+        with serial.Serial(serial_port, baudrate=baud_rate, timeout=0.2) as ser:
+            print(f"✅ Открыт порт {serial_port} @ {baud_rate} бод")
+            print("Введи команду в hex (например, 5aa50483000401) или 'exit':")
+            while True:
+                cmd = input("> ").strip()
+                if cmd.lower() in ('exit', 'quit'):
+                    break
+                try:
+                    packet = hexstr_to_bytes(cmd)
+                    print(f"Отправка: {packet.hex()}")
+                    ser.write(packet)
+                    # Ждем и читаем ответ (до 128 байт, 0.2 сек таймаут)
+                    time.sleep(0.05)
+                    data = ser.read(128)
+                    if data:
+                        print(f"Ответ ({len(data)} байт): {data.hex()}")
+                        parse_dwin_packets(data)
+                    else:
+                        print("Нет ответа (таймаут)!")
+                except Exception as e:
+                    print(f"Ошибка: {e}")
+    except serial.SerialException as e:
+        print(f"❌ Ошибка открытия порта {serial_port}: {e}")
+
+if __name__ == "__main__":
+    main()
