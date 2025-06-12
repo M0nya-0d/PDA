@@ -7,12 +7,21 @@ baud_rate = 19200  # или твоя скорость
 MAX_BUF = 32
 
 def process_packet(packet):
-    # Аналог switch (Buffer[4]):
     cmd = packet[4]
-    if cmd == 0x30:
-        # В Arduino-коде Buffer[8]
-        value = packet[8] if len(packet) > 8 else None
-        print(f"Команда 0x30: Значение Buffer[8] = {value}")
+    # Проверка команды и VP
+    if cmd == 0x83 and len(packet) >= 8:
+        vp = (packet[4+1] << 8) | packet[4+2]
+        value = packet[7]  # обычно младший байт (0x00 или 0x01)
+        # Проверяем нужный VP
+        if vp == 0x1200:
+            if value == 1:
+                print("ВКЛЮЧЕНО! (5A A5 06 83 12 00 01 00 01)")
+            elif value == 0:
+                print("ВЫКЛЮЧЕНО! (5A A5 06 83 12 00 01 00 00)")
+            else:
+                print(f"VP 0x1200: Неизвестное значение: {value}")
+        else:
+            print(f"Другой VP = 0x{vp:04X}, значение: {value}")
     else:
         print(f"Необработанная команда: 0x{cmd:02X}")
 
