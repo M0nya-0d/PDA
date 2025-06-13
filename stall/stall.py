@@ -1,3 +1,4 @@
+from xmlrpc.client import boolean
 import serial
 import time
 import json
@@ -9,14 +10,16 @@ RD = 0
 rd_up = 0
 hp_up = 0
 antirad = 0
+vodka = 0
 params = {}
 
 uart.HP = HP
 uart.RD = RD
 uart.antirad = antirad
+uart.vodka = vodka
 uart.params = params
 
-bool energy = False
+energy = False
 
 serial_port = "/dev/ttyS5"
 baud_rate = 115200
@@ -55,22 +58,26 @@ def update_hp_rd(HP, RD):
     hp_up += 1
     orig_HP, orig_RD = HP, RD
     if RD > 0 and RD <= 1000:
-        if rd_up == 2:
+        if rd_up >= 2:
             RD -= 1
             rd_up = 0
-        if hp_up == 3:    
+        if hp_up >= 3:    
             if HP < 10000:
                 HP += 1
                 hp_up = 0
     # RD 1001...4000
     elif RD > 1000 and RD <= 4000:
-        RD -= 1
+        if rd_up >= 2:
+            RD -= 1
+            rd_up = 0
     # RD 4001...7000
     elif RD > 4000 and RD <= 7000:
-        RD -= 1
-        HP -= 1
-        if HP < 0:
-            HP = 0
+        if rd_up >=2:
+            RD -= 1
+        if hp_up >=2:    
+            HP -= 1
+            if HP < 0:
+                HP = 0
     # RD 7001...8000
     elif RD > 7000 and RD <= 8000:
         HP -= 10
@@ -100,7 +107,7 @@ def save_params(filename, data):
         json.dump(data, f, indent=4)
 
 def main():
-    global HP, RD, antirad, params
+    global HP, RD, antirad, params, vodka
 
     with open(VERS_PATH, "r") as f:
         version = f.read().strip()
@@ -113,11 +120,15 @@ def main():
     for med in params.get("Medicina", []):
         if med["name"] == "Antirad":
             antirad = med["count"]
+    for med in params.get("Medicina", []):
+        if med["name"] == "Vodka":
+            vodka = med["count"]            
 
     # ====== Передаём переменные в uart.py ======
     uart.HP = HP
     uart.RD = RD
     uart.antirad = antirad
+    uart.vodka = vodka
     uart.params = params
 
     ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=0.01)
@@ -151,6 +162,7 @@ def main():
                     HP = uart.HP
                     RD = uart.RD
                     antirad = uart.antirad
+                    vodka = uart.vodka
                     params = uart.params
             buffer = bytearray()
         # конец UART блока
@@ -166,7 +178,8 @@ def main():
 
             int_write(0x5000, HP)  #отправка на экран 
             int_write(0x5001, RD)  #отправка на экран 
-            int_write(0x5501, antirad) #отправка на экран 
+            int_write(0x5301, antirad) #отправка коллич на экран 
+            int_write(0x5302, vodka) #отправка коллич на экран
             print(f'HP = {HP}, RD = {RD}')
 
             if changed:
