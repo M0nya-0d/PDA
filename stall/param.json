@@ -1,7 +1,7 @@
 {
   "nikname": "vas9",
   "HP": 9500,
-  "RD": 1000,
+  "RD": 8000,
   "Medicina": [
     {"name": "fafa", "count": 2},
     {"name": "frfr", "count": 1},

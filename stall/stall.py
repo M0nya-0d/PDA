@@ -1,6 +1,7 @@
 import serial
 import time
 import json
+from uart import process_packet
 
 serial_port = "/dev/ttyS5"
 baud_rate = 115200
@@ -39,21 +40,25 @@ def update_hp_rd(HP, RD):
         RD -= 1
         if HP < 10000:
             HP += 1
-    elif 1000 < RD < 7000:
+    elif RD > 1000 and RD <= 4000:
         RD -= 1
-    elif 4000 < RD < 7000:
+    elif RD > 4000 and RD <= 7000:
         RD -= 1
         HP -= 1
         if HP <0:
             HP = 0
-    elif 7000 < RD < 8000:
+    elif RD > 7000 and RD <= 8000:
         HP -= 10
         if HP < 0:
             HP = 0
-    elif 8000 < RD < 9000:
+    elif RD > 8000 and RD <= 9000:
         HP -= 20
         if HP < 0:
             HP = 0
+    elif RD == 0 and HP < 10000:
+        HP += 1
+        if HP > 10000:
+            HP = 10000        
     changed = (HP != orig_HP) or (RD != orig_RD)
     return HP, RD, changed
 
@@ -67,6 +72,10 @@ def save_params(filename, data):
         json.dump(data, f, indent=4)
 
 def main():
+    ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=0.01)
+    buffer = bytearray()
+    tcount = 0
+    last_byte_time = time.time()
     with open(VERS_PATH, "r") as f:
         version = f.read().strip()
     print(f"Версия программы: {version}")
@@ -80,6 +89,25 @@ def main():
     need_save = False
 
     while True:
+        # =============== UART обработка ===================
+        data = ser.read(1)
+        if data:
+            buffer += data
+            if len(buffer) < 32:
+                tcount = 5
+            last_byte_time = time.time()
+        else:
+            if tcount > 0 and (time.time() - last_byte_time) > 0.002:
+                tcount -= 1
+                last_byte_time = time.time()
+        if tcount == 0 and len(buffer) > 0:
+            if len(buffer) >= 3 and buffer[0] == 0x5A and buffer[1] == 0xA5:
+                plen = buffer[2]
+                if len(buffer) >= plen + 3:
+                    packet = buffer[:plen + 3]
+                    process_packet(packet)
+            buffer = bytearray()
+        # ============ Конец UART блока ====================        
         now = time.monotonic()
         if now - last_update >= 1.0:
             last_update = now

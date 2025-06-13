@@ -1,29 +1,37 @@
 import serial
 import time
 
+
 serial_port = "/dev/ttyS5"
-baud_rate = 19200  # или твоя скорость
+baud_rate = 115200  # или твоя скорость
 
 MAX_BUF = 32
 
 def process_packet(packet):
-    cmd = packet[4]
-    # Проверка команды и VP
-    if cmd == 0x83 and len(packet) >= 8:
-        vp = (packet[4+1] << 8) | packet[4+2]
-        value = packet[7]  # обычно младший байт (0x00 или 0x01)
-        # Проверяем нужный VP
-        if vp == 0x1200:
-            if value == 1:
-                print("ВКЛЮЧЕНО! (5A A5 06 83 12 00 01 00 01)")
-            elif value == 0:
-                print("ВЫКЛЮЧЕНО! (5A A5 06 83 12 00 01 00 00)")
+    if packet[0] == 0x5A and packet[1] == 0xA5:
+        if len(packet) >= 9 and packet[3] == 0x83:
+            vp = (packet[4] << 8) | packet[5]
+            value = packet[8]
+            if vp == 0x5501:
+                if value == 1:
+                    print("используем антирад")
+                elif value == 0:
+                    print("СОСТОЯНИЕ: ВЫКЛЮЧЕНО (OFF)")
+                else:
+                    print(f"СОСТОЯНИЕ: Неизвестное ({value})")
+            elif vp == 0x5502:
+                if value == 1:
+                    print("используем Б19")
+                elif value == 0:
+                    print("СОСТОЯНИЕ: Б19 выключен")
+                else:
+                    print(f"СОСТОЯНИЕ Б19: Неизвестное ({value})")
             else:
-                print(f"VP 0x1200: Неизвестное значение: {value}")
+                print(f"VP 0x{vp:04X}: значение {value}")
         else:
-            print(f"Другой VP = 0x{vp:04X}, значение: {value}")
+            print("Пакет нераспознан или слишком короткий:", packet.hex())
     else:
-        print(f"Необработанная команда: 0x{cmd:02X}")
+        print("Пакет не DWIN или нераспознан")
 
 def main():
     with serial.Serial(serial_port, baudrate=baud_rate, timeout=0.01) as ser:
@@ -53,6 +61,3 @@ def main():
                 # После обработки сбрасываем буфер
                 buffer = bytearray()
             time.sleep(0.001)
-
-if __name__ == "__main__":
-    main()
