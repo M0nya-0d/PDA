@@ -1,4 +1,3 @@
-from xmlrpc.client import boolean
 import serial
 import time
 import json
@@ -19,7 +18,7 @@ uart.antirad = antirad
 uart.vodka = vodka
 uart.params = params
 
-energy = False
+oasis = True
 
 serial_port = "/dev/ttyS5"
 baud_rate = 115200
@@ -52,11 +51,22 @@ def send_text(addr, text):
     with serial.Serial(serial_port, baud_rate, timeout=1) as ser:
         ser.write(packet)
 
-def update_hp_rd(HP, RD):
-    global rd_up, hp_up
+def update_hp_rd(HP, RD, ser=None):
+    global rd_up, hp_up, oasis
     rd_up += 1
     hp_up += 1
     orig_HP, orig_RD = HP, RD
+    if oasis:
+        if ser:
+            ser.write(bytes([0x5A, 0xA5, 0x06, 0x83, 0x00, 0x14, 0x01, 0x00, 0x01]))        
+        if RD > 0:
+            RD = 0
+        HP += 30
+        if HP > 10000:
+            HP = 10000
+            oasis = False
+            if ser:
+                ser.write(bytes([0x5A, 0xA5, 0x06, 0x83, 0x00, 0x14, 0x01, 0x00, 0x00]))
     if RD > 0 and RD <= 1000:
         if rd_up >= 2:
             RD -= 1
@@ -112,6 +122,32 @@ def main():
     with open(VERS_PATH, "r") as f:
         version = f.read().strip()
     print(f"Версия программы: {version}")
+
+    ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=0.01)
+
+    def int_write(addr, num):
+        packet = bytearray([
+            0x5A, 0xA5,
+            0x05,
+            0x82,
+            (addr >> 8) & 0xFF, addr & 0xFF,
+            (num >> 8) & 0xFF, num & 0xFF
+        ])
+        ser.write(packet)
+
+    def send_text(addr, text):
+        text = text.ljust(TEXT_LENGTH)
+        text_bytes = text.encode("ascii")
+        length = 3 + len(text_bytes)
+        packet = bytearray([
+            0x5A, 0xA5,
+            length,
+            0x82,
+            (addr >> 8) & 0xFF, addr & 0xFF
+        ]) + text_bytes
+        print("Отправляется пакет:", packet.hex())
+        ser.write(packet)
+
     send_text(0x5999, version)
 
     params = load_params("param.json")
@@ -122,26 +158,22 @@ def main():
             antirad = med["count"]
     for med in params.get("Medicina", []):
         if med["name"] == "Vodka":
-            vodka = med["count"]            
+            vodka = med["count"]
 
-    # ====== Передаём переменные в uart.py ======
     uart.HP = HP
     uart.RD = RD
     uart.antirad = antirad
     uart.vodka = vodka
     uart.params = params
 
-    ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=0.01)
     buffer = bytearray()
     tcount = 0
     last_byte_time = time.time()
-
     last_update = time.monotonic()
     save_counter = 0
     need_save = False
 
     while True:
-        # UART обработка
         data = ser.read(1)
         if data:
             buffer += data
@@ -158,19 +190,17 @@ def main():
                 if len(buffer) >= plen + 3:
                     packet = buffer[:plen + 3]
                     uart.process_packet(packet)
-                     #Копируем обратно, если в uart.process_packet() были изменения
                     HP = uart.HP
                     RD = uart.RD
                     antirad = uart.antirad
                     vodka = uart.vodka
                     params = uart.params
             buffer = bytearray()
-        # конец UART блока
 
         now = time.monotonic()
         if now - last_update >= 1.0:
             last_update = now
-            HP, RD, changed = update_hp_rd(HP, RD)
+            HP, RD, changed = update_hp_rd(HP, RD, ser)  # Если надо — передай сюда ser!
             uart.HP = HP
             uart.RD = RD
             params["HP"] = HP
@@ -179,12 +209,12 @@ def main():
                 if med["name"] == "Antirad":
                     med["count"] = antirad
                 elif med["name"] == "Vodka":
-                    med["count"] = vodka            
+                    med["count"] = vodka
 
-            int_write(0x5000, HP)  #отправка на экран 
-            int_write(0x5001, RD)  #отправка на экран 
-            int_write(0x5301, antirad) #отправка коллич на экран 
-            int_write(0x5302, vodka) #отправка коллич на экран
+            int_write(0x5000, HP)
+            int_write(0x5001, RD)
+            int_write(0x5301, antirad)
+            int_write(0x5302, vodka)
             print(f'HP = {HP}, RD = {RD}')
 
             if changed:
@@ -199,6 +229,3 @@ def main():
                 need_save = False
 
         time.sleep(0.01)
-
-if __name__ == "__main__":
-    main()
