@@ -3,6 +3,11 @@ import time
 import json
 from uart import process_packet
 
+HP = 0
+RD = 0
+
+
+
 serial_port = "/dev/ttyS5"
 baud_rate = 115200
 VERS_PATH = "/home/orangepi/PDA/vers.txt"
@@ -72,6 +77,7 @@ def save_params(filename, data):
         json.dump(data, f, indent=4)
 
 def main():
+    global HP, RD
     ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=0.01)
     buffer = bytearray()
     tcount = 0

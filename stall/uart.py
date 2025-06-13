@@ -8,6 +8,7 @@ baud_rate = 115200  # или твоя скорость
 MAX_BUF = 32
 
 def process_packet(packet):
+    global HP, RD
     if packet[0] == 0x5A and packet[1] == 0xA5:
         if len(packet) >= 9 and packet[3] == 0x83:
             vp = (packet[4] << 8) | packet[5]
@@ -15,6 +16,10 @@ def process_packet(packet):
             if vp == 0x5501:
                 if value == 1:
                     print("используем антирад")
+                    RD -= 7000:
+                    HP -= 2000:
+                    if RD < 0: RD = 0
+                    if HP < 0: HP = 0
                 elif value == 0:
                     print("СОСТОЯНИЕ: ВЫКЛЮЧЕНО (OFF)")
                 else:
