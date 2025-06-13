@@ -16,8 +16,8 @@ def process_packet(packet):
             if vp == 0x5501:
                 if value == 1:
                     print("используем антирад")
-                    RD -= 7000:
-                    HP -= 2000:
+                    RD -= 7000
+                    HP -= 2000
                     if RD < 0: RD = 0
                     if HP < 0: HP = 0
                 elif value == 0:
