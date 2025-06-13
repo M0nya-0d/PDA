@@ -5,6 +5,8 @@ from uart import process_packet
 
 HP = 0
 RD = 0
+antirad = 0
+params = {}
 
 
 
@@ -77,7 +79,7 @@ def save_params(filename, data):
         json.dump(data, f, indent=4)
 
 def main():
-    global HP, RD
+    global HP, RD, antirad
     ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=0.01)
     buffer = bytearray()
     tcount = 0
@@ -89,6 +91,10 @@ def main():
     params = load_params("param.json")
     HP = params["HP"]
     RD = params["RD"]
+    for med in params.get("Medicina", []):
+        if med["name"] == "Antirad":
+            antirad = med["count"]
+
 
     last_update = time.monotonic()
     save_counter = 0

@@ -4,10 +4,10 @@
   "RD": 8000,
   "Medicina": [
     {"name": "fafa", "count": 2},
-    {"name": "frfr", "count": 1},
+    {"name": "Antirad", "count": 2},
     {"name": "gfgf", "count": 1},
     {"name": "fddf", "count": 4},
-    {"name": "sasa", "count": 3}
+    {"name": "Anti", "count": 3}
   ],
   "Armor": [
     {"name": "djins", "count": 0},
