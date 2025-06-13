@@ -6,6 +6,8 @@ import uart
 
 HP = 0
 RD = 0
+rd_up = 0
+hp_up = 0
 antirad = 0
 params = {}
 
@@ -13,6 +15,8 @@ uart.HP = HP
 uart.RD = RD
 uart.antirad = antirad
 uart.params = params
+
+bool energy = False
 
 serial_port = "/dev/ttyS5"
 baud_rate = 115200
@@ -46,32 +50,45 @@ def send_text(addr, text):
         ser.write(packet)
 
 def update_hp_rd(HP, RD):
+    global rd_up, hp_up
+    rd_up += 1
+    hp_up += 1
     orig_HP, orig_RD = HP, RD
     if RD > 0 and RD <= 1000:
-        RD -= 1
-        if HP < 10000:
-            HP += 1
+        if rd_up == 2:
+            RD -= 1
+            rd_up = 0
+        if hp_up == 3:    
+            if HP < 10000:
+                HP += 1
+                hp_up = 0
+    # RD 1001...4000
     elif RD > 1000 and RD <= 4000:
         RD -= 1
+    # RD 4001...7000
     elif RD > 4000 and RD <= 7000:
         RD -= 1
         HP -= 1
-        if HP <0:
+        if HP < 0:
             HP = 0
+    # RD 7001...8000
     elif RD > 7000 and RD <= 8000:
         HP -= 10
         if HP < 0:
             HP = 0
-    elif RD > 8000 and RD <= 9000:
+    # RD 8001...12000
+    elif RD > 8000 and RD <= 12000:
         HP -= 20
         if HP < 0:
             HP = 0
+    # RD == 0
     elif RD == 0 and HP < 10000:
         HP += 1
         if HP > 10000:
-            HP = 10000        
+            HP = 10000
     changed = (HP != orig_HP) or (RD != orig_RD)
     return HP, RD, changed
+
 
 def load_params(filename):
     with open(filename, "r") as f:
@@ -147,8 +164,9 @@ def main():
             params["HP"] = HP
             params["RD"] = RD
 
-            int_write(0x5000, HP)
-            int_write(0x5001, RD)
+            int_write(0x5000, HP)  #отправка на экран 
+            int_write(0x5001, RD)  #отправка на экран 
+            int_write(0x5501, antirad) #отправка на экран 
             print(f'HP = {HP}, RD = {RD}')
 
             if changed:

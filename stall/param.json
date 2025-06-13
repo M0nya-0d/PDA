@@ -3,11 +3,10 @@
   "HP": 9500,
   "RD": 8000,
   "Medicina": [
-    {"name": "fafa", "count": 2},
+    {"name": "B190", "count": 2},
     {"name": "Antirad", "count": 2},
-    {"name": "gfgf", "count": 1},
-    {"name": "fddf", "count": 4},
-    {"name": "Anti", "count": 3}
+    {"name": "Anabiotic", "count": 1},
+    {"name": "vodka", "count": 4}
   ],
   "Armor": [
     {"name": "djins", "count": 0},
