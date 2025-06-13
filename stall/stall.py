@@ -130,7 +130,7 @@ def main():
                 if len(buffer) >= plen + 3:
                     packet = buffer[:plen + 3]
                     uart.process_packet(packet)
-                    # Копируем обратно, если в uart.process_packet() были изменения
+                     #Копируем обратно, если в uart.process_packet() были изменения
                     HP = uart.HP
                     RD = uart.RD
                     antirad = uart.antirad
@@ -142,6 +142,11 @@ def main():
         if now - last_update >= 1.0:
             last_update = now
             HP, RD, changed = update_hp_rd(HP, RD)
+            uart.HP = HP
+            uart.RD = RD
+            params["HP"] = HP
+            params["RD"] = RD
+
             int_write(0x5000, HP)
             int_write(0x5001, RD)
             print(f'HP = {HP}, RD = {RD}')
@@ -151,8 +156,6 @@ def main():
                 save_counter += 1
                 if save_counter >= 60:
                     save_counter = 0
-                    params["HP"] = HP
-                    params["RD"] = RD
                     save_params("param.json", params)
                     print("Сохранено в param.json после изменений")
             else:
