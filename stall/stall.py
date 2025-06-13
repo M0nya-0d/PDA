@@ -175,6 +175,11 @@ def main():
             uart.RD = RD
             params["HP"] = HP
             params["RD"] = RD
+            for med in params.get("Medicina", []):
+                if med["name"] == "Antirad":
+                    med["count"] = antirad
+                elif med["name"] == "Vodka":
+                    med["count"] = vodka            
 
             int_write(0x5000, HP)  #отправка на экран 
             int_write(0x5001, RD)  #отправка на экран 

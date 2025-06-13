@@ -1,11 +1,8 @@
 import serial
 import time
 
-
 serial_port = "/dev/ttyS5"
-baud_rate = 115200  # или твоя скорость
-
-MAX_BUF = 32
+baud_rate = 115200
 
 def process_packet(packet):
     global HP, RD, antirad, params, vodka
@@ -44,7 +41,7 @@ def process_packet(packet):
                         if RD < 0: RD = 0
                         if HP < 0: HP = 0
                     else:
-                        print("Нет антирада в запасе!")
+                        print("Нет водки в запасе!")
                 elif value == 0:
                     print("СОСТОЯНИЕ: ВЫКЛЮЧЕНО (OFF)")
             else:
@@ -57,28 +54,22 @@ def process_packet(packet):
 def main():
     with serial.Serial(serial_port, baudrate=baud_rate, timeout=0.01) as ser:
         buffer = bytearray()
-        tcount = 0
-        last_byte_time = time.time()
-
         while True:
-            data = ser.read(1)
+            data = ser.read(64)  # Сразу читаем побольше, если есть
             if data:
                 buffer += data
-                if len(buffer) < MAX_BUF:
-                    tcount = 5
-                last_byte_time = time.time()
-            else:
-                # Каждые 2 мс декрементируем tcount (имитация Arduino)
-                if tcount > 0 and (time.time() - last_byte_time) > 0.002:
-                    tcount -= 1
-                    last_byte_time = time.time()
+            # Парсим все возможные пакеты в буфере
+            while len(buffer) >= 3:
+                # Ищем начало пакета
+                if buffer[0] != 0x5A or buffer[1] != 0xA5:
+                    buffer = buffer[1:]  # Убираем мусор до заголовка
+                    continue
+                plen = buffer[2]
+                packet_len = plen + 3
+                if len(buffer) < packet_len:
+                    break  # Ждём, пока весь пакет придёт
+                packet = buffer[:packet_len]
+                process_packet(packet)
+                buffer = buffer[packet_len:]  # Удаляем обработанное
 
-            if tcount == 0 and len(buffer) > 0:
-                if len(buffer) >= 3 and buffer[0] == 0x5A and buffer[1] == 0xA5:
-                    plen = buffer[2]
-                    if len(buffer) >= plen + 3:
-                        packet = buffer[:plen + 3]
-                        process_packet(packet)
-                # После обработки сбрасываем буфер
-                buffer = bytearray()
             time.sleep(0.001)
