@@ -1,14 +1,18 @@
 import serial
 import time
 import json
-from uart import process_packet
+import uart
+
 
 HP = 0
 RD = 0
 antirad = 0
 params = {}
 
-
+uart.HP = HP
+uart.RD = RD
+uart.antirad = antirad
+uart.params = params
 
 serial_port = "/dev/ttyS5"
 baud_rate = 115200
@@ -79,15 +83,13 @@ def save_params(filename, data):
         json.dump(data, f, indent=4)
 
 def main():
-    global HP, RD, antirad
-    ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=0.01)
-    buffer = bytearray()
-    tcount = 0
-    last_byte_time = time.time()
+    global HP, RD, antirad, params
+
     with open(VERS_PATH, "r") as f:
         version = f.read().strip()
     print(f"Версия программы: {version}")
     send_text(0x5999, version)
+
     params = load_params("param.json")
     HP = params["HP"]
     RD = params["RD"]
@@ -95,13 +97,23 @@ def main():
         if med["name"] == "Antirad":
             antirad = med["count"]
 
+    # ====== Передаём переменные в uart.py ======
+    uart.HP = HP
+    uart.RD = RD
+    uart.antirad = antirad
+    uart.params = params
+
+    ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=0.01)
+    buffer = bytearray()
+    tcount = 0
+    last_byte_time = time.time()
 
     last_update = time.monotonic()
     save_counter = 0
     need_save = False
 
     while True:
-        # =============== UART обработка ===================
+        # UART обработка
         data = ser.read(1)
         if data:
             buffer += data
@@ -117,9 +129,15 @@ def main():
                 plen = buffer[2]
                 if len(buffer) >= plen + 3:
                     packet = buffer[:plen + 3]
-                    process_packet(packet)
+                    uart.process_packet(packet)
+                    # Копируем обратно, если в uart.process_packet() были изменения
+                    HP = uart.HP
+                    RD = uart.RD
+                    antirad = uart.antirad
+                    params = uart.params
             buffer = bytearray()
-        # ============ Конец UART блока ====================        
+        # конец UART блока
+
         now = time.monotonic()
         if now - last_update >= 1.0:
             last_update = now
@@ -128,7 +146,6 @@ def main():
             int_write(0x5001, RD)
             print(f'HP = {HP}, RD = {RD}')
 
-            # Если были изменения — запускаем счетчик, иначе сбрасываем
             if changed:
                 need_save = True
                 save_counter += 1
