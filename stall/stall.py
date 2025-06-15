@@ -11,6 +11,9 @@ hp_up = 0
 antirad = 0
 vodka = 0
 bint = 0
+apteka20 = 0
+apteka30 = 0
+apteka50 = 0
 params = {}
 
 uart.HP = HP
@@ -18,6 +21,9 @@ uart.RD = RD
 uart.antirad = antirad
 uart.vodka = vodka
 uart.bint = bint
+uart.bint = apteka20
+uart.bint = apteka30
+uart.bint = apteka50
 uart.params = params
 
 oasis = False
@@ -138,7 +144,7 @@ def save_params(filename, data):
         json.dump(data, f, indent=4)
 
 def main():
-    global HP, RD, antirad, params, vodka
+    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50
 
     ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=0.01)
 
@@ -183,13 +189,25 @@ def main():
             vodka = med["count"]
     for med in params.get("Medicina", []):
         if med["name"] == "Bint":
-            bint = med["count"]            
+            bint = med["count"]
+    for med in params.get("Medicina", []):
+        if med["name"] == "Apteka20":
+            apteka20 = med["count"] 
+    for med in params.get("Medicina", []):
+        if med["name"] == "Apteka30":
+            apteka30 = med["count"]
+    for med in params.get("Medicina", []):
+        if med["name"] == "Apteka50":
+            apteka50 = med["count"]                                   
 
     uart.HP = HP
     uart.RD = RD
     uart.antirad = antirad
     uart.vodka = vodka
     uart.bint = bint
+    uart.bint = apteka20
+    uart.bint = apteka30
+    uart.bint = apteka50
     uart.params = params
 
     buffer = bytearray()
@@ -239,12 +257,22 @@ def main():
                     med["count"] = vodka
                 elif med["name"] == "Bint":
                     med["count"] = bint
+                elif med["name"] == "Apteka20":
+                    med["count"] = apteka20
+                elif med["name"] == "Apteka30":
+                    med["count"] = apteka30
+                elif med["name"] == "Apteka50":
+                    med["count"] = apteka50  
             for packet in packets:
                 ser.write(packet)
             int_write(0x5000, HP)
             int_write(0x5001, RD)
             int_write(0x5301, antirad)
             int_write(0x5302, vodka)
+            int_write(0x5302, bint)
+            int_write(0x5309, apteka20)
+            int_write(0x5310, apteka30)
+            int_write(0x5311, apteka50)
             int_write(0x5999, int_version)
             print(f'HP = {HP}, RD = {RD}')
 

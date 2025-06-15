@@ -7,7 +7,10 @@
     {"name": "Antirad", "count": 2},
     {"name": "Anabiotic", "count": 1},
     {"name": "Vodka", "count": 4},
-    {"name": "Bint", "count": 2}
+    {"name": "Bint", "count": 2},
+    {"name": "Apteka20", "count": 2},
+    {"name": "Apteka30", "count": 2},
+    {"name": "Apteka50", "count": 2}
   ],
   "Armor": [
     {"name": "djins", "count": 0},
