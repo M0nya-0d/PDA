@@ -278,7 +278,7 @@ def main():
             int_write(0x5311, apteka50)
             int_write(0x5999, int_version)
 
-            now_time = time.strftime("%H%M")
+            now_time = time.strftime("%H%M", time.localtime())
             int_time = int(now_time)
             int_write(0x5990, int_time)
             print(int_time)            

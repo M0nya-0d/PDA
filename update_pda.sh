@@ -17,6 +17,7 @@ REMOTE_VERSION=$(curl -s "$REPO_URL")
 
 echo "🔍 Локальная версия: $LOCAL_VERSION"
 echo "🌐 Версия в репозитории: $REMOTE_VERSION"
+sudo timedatectl set-timezone Europe/Kiev
 
 if [ "$LOCAL_VERSION" != "$REMOTE_VERSION" ]; then
     echo "⬇️ Обнаружено обновление, выполняется git pull..."
