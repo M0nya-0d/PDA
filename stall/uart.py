@@ -5,7 +5,7 @@ serial_port = "/dev/ttyS5"
 baud_rate = 115200
 
 def process_packet(packet):
-    global HP, RD, antirad, params, vodka
+    global HP, RD, antirad, params, vodka, bint
     if packet[0] == 0x5A and packet[1] == 0xA5:
         if len(packet) >= 9 and packet[3] == 0x83:
             vp = (packet[4] << 8) | packet[5]
@@ -44,6 +44,19 @@ def process_packet(packet):
                         print("Нет водки в запасе!")
                 elif value == 0:
                     print("СОСТОЯНИЕ: ВЫКЛЮЧЕНО (OFF)")
+            elif vp == 0x5600:
+                if value == 1:
+                    if bint > 0:
+                        print("используем водка")  
+                        bint -= 1   
+                        for med in params.get("Medicina", [])
+                            if med["name"] == "Bint":  
+                                med["count"] = bint
+                                break 
+                        HP += 1000 
+                        if HP > 10000: HP = 10000
+                    else:
+                         print("Нет водки в запасе!")      
             else:
                 print(f"VP 0x{vp:04X}: значение {value}")
         else:

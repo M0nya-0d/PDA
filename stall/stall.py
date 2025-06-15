@@ -10,12 +10,14 @@ rd_up = 0
 hp_up = 0
 antirad = 0
 vodka = 0
+bint = 0
 params = {}
 
 uart.HP = HP
 uart.RD = RD
 uart.antirad = antirad
 uart.vodka = vodka
+uart.bint = bint
 uart.params = params
 
 oasis = False
@@ -179,11 +181,15 @@ def main():
     for med in params.get("Medicina", []):
         if med["name"] == "Vodka":
             vodka = med["count"]
+    for med in params.get("Medicina", []):
+        if med["name"] == "Bint":
+            bint = med["count"]            
 
     uart.HP = HP
     uart.RD = RD
     uart.antirad = antirad
     uart.vodka = vodka
+    uart.bint = bint
     uart.params = params
 
     buffer = bytearray()
@@ -214,6 +220,7 @@ def main():
                     RD = uart.RD
                     antirad = uart.antirad
                     vodka = uart.vodka
+                    bint = uart.bint
                     params = uart.params
             buffer = bytearray()
 
@@ -230,6 +237,8 @@ def main():
                     med["count"] = antirad
                 elif med["name"] == "Vodka":
                     med["count"] = vodka
+                elif med["name"] == "Bint":
+                    med["count"] = bint
             for packet in packets:
                 ser.write(packet)
             int_write(0x5000, HP)
