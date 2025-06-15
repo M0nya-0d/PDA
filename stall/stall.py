@@ -117,7 +117,7 @@ def update_hp_rd(HP, RD):
                 norma = False
                 HP = 0
                 RD = 0 
-                send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
+                send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x0A]))
         elif RD == 0 and HP < 10000:
             HP += 1
             if HP > 10000:
