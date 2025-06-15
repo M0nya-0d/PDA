@@ -277,6 +277,10 @@ def main():
             int_write(0x5310, apteka30)
             int_write(0x5311, apteka50)
             int_write(0x5999, int_version)
+
+            now_time = time.strftime("%H%M")
+            int_time = int(now_time)
+            int_write(0x5998, int_time)            
             print(f'HP = {HP}, RD = {RD}')
 
             if changed:
