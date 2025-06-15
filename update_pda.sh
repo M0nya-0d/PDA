@@ -6,6 +6,16 @@ LOCAL_VER_FILE="$REPO_DIR/vers.txt"
 
 echo "🔁 Проверка обновлений..."
 
+# Синхронизация времени
+sudo timedatectl set-timezone Europe/Kiev
+echo "⏰ Синхронизация времени..."
+if command -v ntpdate >/dev/null 2>&1; then
+    sudo ntpdate pool.ntp.org
+else
+    sudo timedatectl set-ntp true
+    sleep 5
+fi
+
 # Проверка локальной версии
 if [ ! -f "$LOCAL_VER_FILE" ]; then
     echo "❌ Локальный vers.txt не найден!"
@@ -17,13 +27,12 @@ REMOTE_VERSION=$(curl -s "$REPO_URL")
 
 echo "🔍 Локальная версия: $LOCAL_VERSION"
 echo "🌐 Версия в репозитории: $REMOTE_VERSION"
-sudo timedatectl set-timezone Europe/Kiev
 
 if [ "$LOCAL_VERSION" != "$REMOTE_VERSION" ]; then
     echo "⬇️ Обнаружено обновление, выполняется git pull..."
     git -C "$REPO_DIR" reset --hard HEAD
-    git -C "$REPO_DIR" pull origin master
-    
+    git -C "$REPO_DIR" pull --no-rebase origin master
+
     chmod +x "/home/orangepi/PDA/update_pda.sh"
     chmod +x "$REPO_DIR/stall/flash_nextion.py"
 
