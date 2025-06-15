@@ -280,7 +280,8 @@ def main():
 
             now_time = time.strftime("%H%M")
             int_time = int(now_time)
-            int_write(0x5998, int_time)            
+            int_write(0x5990, int_time)
+            print(int_time)            
             print(f'HP = {HP}, RD = {RD}')
 
             if changed:
