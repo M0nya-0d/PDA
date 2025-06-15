@@ -18,7 +18,8 @@ uart.antirad = antirad
 uart.vodka = vodka
 uart.params = params
 
-oasis = True
+oasis = False
+norma = True
 
 serial_port = "/dev/ttyS5"
 baud_rate = 115200
@@ -52,57 +53,76 @@ def send_text(addr, text):
         ser.write(packet)
 
 def update_hp_rd(HP, RD, ser=None):
-    global rd_up, hp_up, oasis
+    global rd_up, hp_up, oasis, norma
     rd_up += 1
     hp_up += 1
     orig_HP, orig_RD = HP, RD
-    if oasis:
+    if HP < 0:
+        norma = False
         if ser:
-            ser.write(bytes([0x5A, 0xA5, 0x06, 0x83, 0x00, 0x14, 0x01, 0x00, 0x01]))        
+            ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
+    if oasis:
+        norma = False
+        if ser:
+            ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x01]))        
         if RD > 0:
             RD = 0
-        HP += 30
+        HP += 11
         if HP > 10000:
             HP = 10000
             oasis = False
+            norma = True
             if ser:
-                ser.write(bytes([0x5A, 0xA5, 0x06, 0x83, 0x00, 0x14, 0x01, 0x00, 0x00]))
-    if RD > 0 and RD <= 1000:
-        if rd_up >= 2:
-            RD -= 1
-            rd_up = 0
-        if hp_up >= 3:    
-            if HP < 10000:
-                HP += 1
-                hp_up = 0
+                ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x00]))
+    if norma:
+        if RD > 0 and RD <= 1000:
+            if rd_up >= 2:
+                RD -= 1
+                rd_up = 0
+            if hp_up >= 3:    
+                if HP < 10000:
+                    HP += 1
+                    hp_up = 0
     # RD 1001...4000
-    elif RD > 1000 and RD <= 4000:
-        if rd_up >= 2:
-            RD -= 1
-            rd_up = 0
+        elif RD > 1000 and RD <= 4000:
+            if rd_up >= 2:
+                RD -= 1
+                rd_up = 0
+            if hp_up >= 2:
+                HP -= 1
+                if HP < 0:
+                    norma = False 
+                    if ser:
+                        ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))   
     # RD 4001...7000
-    elif RD > 4000 and RD <= 7000:
-        if rd_up >=2:
-            RD -= 1
-        if hp_up >=2:    
-            HP -= 1
-            if HP < 0:
-                HP = 0
+        elif RD > 4000 and RD <= 7000:
+            if rd_up >= 2:
+                RD -= 1
+            if hp_up >= 2:    
+                HP -= 2
+                if HP < 0:
+                    norma = False
+                    if ser:
+                        ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
     # RD 7001...8000
-    elif RD > 7000 and RD <= 8000:
-        HP -= 10
-        if HP < 0:
-            HP = 0
+        elif RD > 7000 and RD <= 8000:
+            HP -= 10
+            if HP < 0:
+                norma = False
+                if ser:
+                    ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
     # RD 8001...12000
-    elif RD > 8000 and RD <= 12000:
-        HP -= 20
-        if HP < 0:
-            HP = 0
+        elif RD > 8000 and RD <= 15000:
+            HP -= 20
+            if HP < 0:
+                norma = False
+                if ser:
+                    ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
     # RD == 0
-    elif RD == 0 and HP < 10000:
-        HP += 1
-        if HP > 10000:
-            HP = 10000
+        elif RD == 0 and HP < 10000:
+            HP += 1
+            if HP > 10000:
+                HP = 10000
     changed = (HP != orig_HP) or (RD != orig_RD)
     return HP, RD, changed
 
@@ -229,3 +249,5 @@ def main():
                 need_save = False
 
         time.sleep(0.01)
+if __name__ == "__main__":
+    main()        
