@@ -1,7 +1,7 @@
 {
   "nikname": "vas9",
-  "HP": 9500,
-  "RD": 8000,
+  "HP": 2500,
+  "RD": 8001,
   "Medicina": [
     {"name": "B190", "count": 2},
     {"name": "Antirad", "count": 2},

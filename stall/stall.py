@@ -76,7 +76,7 @@ def update_hp_rd(HP, RD, ser=None):
                 ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x00]))
     if norma:
         if RD > 0 and RD <= 1000:
-            if rd_up >= 2:
+            if rd_up >= 3:
                 RD -= 1
                 rd_up = 0
             if hp_up >= 3:    
@@ -85,11 +85,12 @@ def update_hp_rd(HP, RD, ser=None):
                     hp_up = 0
     # RD 1001...4000
         elif RD > 1000 and RD <= 4000:
-            if rd_up >= 2:
+            if rd_up >= 3:
                 RD -= 1
                 rd_up = 0
             if hp_up >= 2:
                 HP -= 1
+                hp_up = 0
                 if HP < 0:
                     norma = False 
                     if ser:
@@ -98,12 +99,13 @@ def update_hp_rd(HP, RD, ser=None):
         elif RD > 4000 and RD <= 7000:
             if rd_up >= 2:
                 RD -= 1
+                rd_up = 0
             if hp_up >= 2:    
                 HP -= 2
+                hp_up = 0
                 if HP < 0:
                     norma = False
-                    if ser:
-                        ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
+                    ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
     # RD 7001...8000
         elif RD > 7000 and RD <= 8000:
             HP -= 10
