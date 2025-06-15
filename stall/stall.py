@@ -59,10 +59,10 @@ def update_hp_rd(HP, RD):
     orig_HP, orig_RD = HP, RD
     send_packets = []  # Список байтовых команд, которые нужно отправить
 
-    if HP < 0:
-        norma = False
-        HP = 0
-        send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
+    #if HP <= 0:
+    #    norma = False
+    #   HP = 0
+        #send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
     if oasis:
         norma = False
         send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x01]))
@@ -90,7 +90,7 @@ def update_hp_rd(HP, RD):
             if hp_up >= 2:
                 HP -= 1
                 hp_up = 0
-                if HP < 0:
+                if HP <= 0:
                     norma = False
                     HP = 0 
                     send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))   
@@ -101,19 +101,19 @@ def update_hp_rd(HP, RD):
             if hp_up >= 2:    
                 HP -= 2
                 hp_up = 0
-                if HP < 0:
+                if HP <= 0:
                     norma = False
                     HP = 0
                     send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
         elif RD > 7000 and RD <= 8000:
             HP -= 10
-            if HP < 0:
+            if HP <= 0:
                 norma = False
                 HP = 0
                 send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
         elif RD > 8000 and RD <= 15000:
             HP -= 20
-            if HP < 0:
+            if HP <= 0:
                 norma = False
                 HP = 0 
                 send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
