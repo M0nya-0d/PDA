@@ -240,8 +240,8 @@ def main():
                     vodka = uart.vodka
                     bint = uart.bint
                     apteka20 = uart.apteka20
-                    apteka20 = uart.apteka30
-                    apteka20 = uart.apteka50
+                    apteka30 = uart.apteka30
+                    apteka50 = uart.apteka50
                     params = uart.params
             buffer = bytearray()
 
