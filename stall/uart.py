@@ -59,12 +59,12 @@ def process_packet(packet):
                          print("Нет бинтов в запасе!")  
             elif vp == 0x5601:
                 if value == 1:
-                    if bint > 0:
+                    if apteka20 > 0:
                         print("используем Аптека20")  
-                        bint -= 1   
+                        apteka20 -= 1   
                         for med in params.get("Medicina", []):
-                            if med["name"] == "Bint":  
-                                med["count"] = bint
+                            if med["name"] == "Apteka20":  
+                                med["count"] = apteka20
                                 break 
                         HP += 2000 
                         if HP > 10000: HP = 10000
@@ -72,12 +72,12 @@ def process_packet(packet):
                          print("Нет Аптека20 в запасе!") 
             elif vp == 0x5602:
                 if value == 1:
-                    if bint > 0:
+                    if apteka30 > 0:
                         print("используем Аптека30")  
                         bint -= 1   
                         for med in params.get("Medicina", []):
-                            if med["name"] == "Bint":  
-                                med["count"] = bint
+                            if med["name"] == "Apteka30":  
+                                med["count"] = apteka30
                                 break 
                         HP += 3000 
                         if HP > 10000: HP = 10000
@@ -85,12 +85,12 @@ def process_packet(packet):
                          print("Нет Аптека30 в запасе!")
             elif vp == 0x5603:
                 if value == 1:
-                    if bint > 0:
+                    if apteka50 > 0:
                         print("используем Аптека50")  
-                        bint -= 1   
+                        apteka50 -= 1   
                         for med in params.get("Medicina", []):
-                            if med["name"] == "Bint":  
-                                med["count"] = bint
+                            if med["name"] == "Apteka50":  
+                                med["count"] = apteka50
                                 break 
                         HP += 5000
                         RD -= 3000
