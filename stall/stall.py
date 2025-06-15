@@ -67,7 +67,7 @@ def update_hp_rd(HP, RD):
         send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x01]))
         if RD > 0:
             RD = 0
-        HP += 11
+        HP += 9
         if HP > 8000:
             HP = 8000
             oasis = False
@@ -235,12 +235,13 @@ def main():
             int_write(0x5001, RD)
             int_write(0x5301, antirad)
             int_write(0x5302, vodka)
+            int_write(0x5999, version)
             print(f'HP = {HP}, RD = {RD}')
 
             if changed:
                 need_save = True
                 save_counter += 1
-                if save_counter >= 60:
+                if save_counter >= 10:
                     save_counter = 0
                     save_params("param.json", params)
                     print("Сохранено в param.json после изменений")
