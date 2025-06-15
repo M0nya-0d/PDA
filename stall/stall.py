@@ -59,12 +59,11 @@ def update_hp_rd(HP, RD, ser=None):
     orig_HP, orig_RD = HP, RD
     if HP < 0:
         norma = False
-        if ser:
-            ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
+        HP = 0
+        ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
     if oasis:
         norma = False
-        if ser:
-            ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x01]))        
+        ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x01]))        
         if RD > 0:
             RD = 0
         HP += 11
@@ -72,8 +71,7 @@ def update_hp_rd(HP, RD, ser=None):
             HP = 10000
             oasis = False
             norma = True
-            if ser:
-                ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x00]))
+            ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x00]))
     if norma:
         if RD > 0 and RD <= 1000:
             if rd_up >= 3:
@@ -92,9 +90,9 @@ def update_hp_rd(HP, RD, ser=None):
                 HP -= 1
                 hp_up = 0
                 if HP < 0:
-                    norma = False 
-                    if ser:
-                        ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))   
+                    norma = False
+                    HP = 0 
+                    ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))   
     # RD 4001...7000
         elif RD > 4000 and RD <= 7000:
             if rd_up >= 2:
@@ -105,21 +103,22 @@ def update_hp_rd(HP, RD, ser=None):
                 hp_up = 0
                 if HP < 0:
                     norma = False
+                    HP = 0
                     ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
     # RD 7001...8000
         elif RD > 7000 and RD <= 8000:
             HP -= 10
             if HP < 0:
                 norma = False
-                if ser:
-                    ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
+                HP = 0
+                ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
     # RD 8001...12000
         elif RD > 8000 and RD <= 15000:
             HP -= 20
             if HP < 0:
                 norma = False
-                if ser:
-                    ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
+                HP = 0 
+                ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
     # RD == 0
         elif RD == 0 and HP < 10000:
             HP += 1
