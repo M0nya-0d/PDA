@@ -86,8 +86,8 @@ def update_hp_rd(HP, RD):
             if rd_up >= 3:
                 RD -= 1
                 rd_up = 0
-            if hp_up >= 3:    
-                if HP < 10000:
+            #if hp_up >= 3:    
+                #if HP < 10000:
                     #HP += 1
                     #hp_up = 0
         elif RD > 1000 and RD <= 4000:
