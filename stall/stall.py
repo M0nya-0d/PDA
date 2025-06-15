@@ -88,8 +88,8 @@ def update_hp_rd(HP, RD):
                 rd_up = 0
             if hp_up >= 3:    
                 if HP < 10000:
-                    HP += 1
-                    hp_up = 0
+                    #HP += 1
+                    #hp_up = 0
         elif RD > 1000 and RD <= 4000:
             if rd_up >= 3:
                 RD -= 1
@@ -106,7 +106,7 @@ def update_hp_rd(HP, RD):
                 RD -= 1
                 rd_up = 0
             if hp_up >= 2:    
-                HP -= 2
+                HP -= 5
                 hp_up = 0
                 if HP <= 0:
                     norma = False
@@ -280,7 +280,7 @@ def main():
 
             now_time = time.strftime("%H%M", time.localtime())
             int_time = int(now_time)
-            int_write(0x5990, int_time)
+            int_write(0x5990, int_time) # время
             print(int_time)            
             print(f'HP = {HP}, RD = {RD}')
 
