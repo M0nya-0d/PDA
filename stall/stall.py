@@ -142,6 +142,9 @@ def main():
         version = f.read().strip()
     print(f"Версия программы: {version}")
 
+    int_version = int(version)  
+    int_write(0x5999, int_version)
+
     ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=0.01)
 
     def int_write(addr, num):
