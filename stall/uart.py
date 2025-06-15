@@ -74,7 +74,7 @@ def process_packet(packet):
                 if value == 1:
                     if apteka30 > 0:
                         print("используем Аптека30")  
-                        bint -= 1   
+                        apteka30 -= 1   
                         for med in params.get("Medicina", []):
                             if med["name"] == "Apteka30":  
                                 med["count"] = apteka30
