@@ -233,12 +233,15 @@ def main():
                 plen = buffer[2]
                 if len(buffer) >= plen + 3:
                     packet = buffer[:plen + 3]
-                    uart.process_packet(packet)
+                    uart.process_packet(packet) # забрал после юарта
                     HP = uart.HP
                     RD = uart.RD
                     antirad = uart.antirad
                     vodka = uart.vodka
                     bint = uart.bint
+                    apteka20 = uart.apteka20
+                    apteka20 = uart.apteka30
+                    apteka20 = uart.apteka50
                     params = uart.params
             buffer = bytearray()
 
@@ -250,7 +253,7 @@ def main():
             uart.RD = RD
             params["HP"] = HP
             params["RD"] = RD
-            for med in params.get("Medicina", []):
+            for med in params.get("Medicina", []): # записал в файл
                 if med["name"] == "Antirad":
                     med["count"] = antirad
                 elif med["name"] == "Vodka":
@@ -263,7 +266,7 @@ def main():
                     med["count"] = apteka30
                 elif med["name"] == "Apteka50":
                     med["count"] = apteka50  
-            for packet in packets:
+            for packet in packets:   # обновляю на экран
                 ser.write(packet)
             int_write(0x5000, HP)
             int_write(0x5001, RD)
