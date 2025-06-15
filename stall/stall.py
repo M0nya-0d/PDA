@@ -52,18 +52,20 @@ def send_text(addr, text):
     with serial.Serial(serial_port, baud_rate, timeout=1) as ser:
         ser.write(packet)
 
-def update_hp_rd(HP, RD, ser=None):
+def update_hp_rd(HP, RD):
     global rd_up, hp_up, oasis, norma
     rd_up += 1
     hp_up += 1
     orig_HP, orig_RD = HP, RD
+    send_packets = []  # Список байтовых команд, которые нужно отправить
+
     if HP < 0:
         norma = False
         HP = 0
-        ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
+        send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
     if oasis:
         norma = False
-        ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x01]))        
+        send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x01]))
         if RD > 0:
             RD = 0
         HP += 11
@@ -71,7 +73,7 @@ def update_hp_rd(HP, RD, ser=None):
             HP = 10000
             oasis = False
             norma = True
-            ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x00]))
+            send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x00]))
     if norma:
         if RD > 0 and RD <= 1000:
             if rd_up >= 3:
@@ -81,7 +83,6 @@ def update_hp_rd(HP, RD, ser=None):
                 if HP < 10000:
                     HP += 1
                     hp_up = 0
-    # RD 1001...4000
         elif RD > 1000 and RD <= 4000:
             if rd_up >= 3:
                 RD -= 1
@@ -92,8 +93,7 @@ def update_hp_rd(HP, RD, ser=None):
                 if HP < 0:
                     norma = False
                     HP = 0 
-                    ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))   
-    # RD 4001...7000
+                    send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))   
         elif RD > 4000 and RD <= 7000:
             if rd_up >= 2:
                 RD -= 1
@@ -104,28 +104,26 @@ def update_hp_rd(HP, RD, ser=None):
                 if HP < 0:
                     norma = False
                     HP = 0
-                    ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
-    # RD 7001...8000
+                    send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
         elif RD > 7000 and RD <= 8000:
             HP -= 10
             if HP < 0:
                 norma = False
                 HP = 0
-                ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
-    # RD 8001...12000
+                send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
         elif RD > 8000 and RD <= 15000:
             HP -= 20
             if HP < 0:
                 norma = False
                 HP = 0 
-                ser.write(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
-    # RD == 0
+                send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
         elif RD == 0 and HP < 10000:
             HP += 1
             if HP > 10000:
                 HP = 10000
     changed = (HP != orig_HP) or (RD != orig_RD)
-    return HP, RD, changed
+    return HP, RD, changed, send_packets
+
 
 
 def load_params(filename):
@@ -221,7 +219,7 @@ def main():
         now = time.monotonic()
         if now - last_update >= 1.0:
             last_update = now
-            HP, RD, changed = update_hp_rd(HP, RD, ser)  # Если надо — передай сюда ser!
+            HP, RD, changed, packets = update_hp_rd(HP, RD)  
             uart.HP = HP
             uart.RD = RD
             params["HP"] = HP
@@ -231,7 +229,8 @@ def main():
                     med["count"] = antirad
                 elif med["name"] == "Vodka":
                     med["count"] = vodka
-
+            for packet in packets:
+                ser.write(packet)
             int_write(0x5000, HP)
             int_write(0x5001, RD)
             int_write(0x5301, antirad)
