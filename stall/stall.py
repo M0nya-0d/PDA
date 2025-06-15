@@ -58,7 +58,9 @@ def update_hp_rd(HP, RD):
     hp_up += 1
     orig_HP, orig_RD = HP, RD
     send_packets = []  # Список байтовых команд, которые нужно отправить
-
+    if hp_up == 10:
+        send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x00]))
+        norma = True
     #if HP <= 0:
     #    norma = False
     #   HP = 0
@@ -118,9 +120,6 @@ def update_hp_rd(HP, RD):
                 HP = 0
                 RD = 0 
                 send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x0A]))
-                time.sleep(10)
-                send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x00]))
-                norma = True
         elif RD == 0 and HP < 10000:
             HP += 1
             if HP > 10000:
