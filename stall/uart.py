@@ -49,7 +49,7 @@ def process_packet(packet):
                     if bint > 0:
                         print("используем водка")  
                         bint -= 1   
-                        for med in params.get("Medicina", [])
+                        for med in params.get("Medicina", []):
                             if med["name"] == "Bint":  
                                 med["count"] = bint
                                 break 
