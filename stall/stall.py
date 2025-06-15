@@ -138,13 +138,6 @@ def save_params(filename, data):
 def main():
     global HP, RD, antirad, params, vodka
 
-    with open(VERS_PATH, "r") as f:
-        version = f.read().strip()
-    print(f"Версия программы: {version}")
-
-    int_version = int(version)  
-    int_write(0x5999, int_version)
-
     ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=0.01)
 
     def int_write(addr, num):
@@ -170,7 +163,12 @@ def main():
         print("Отправляется пакет:", packet.hex())
         ser.write(packet)
 
-    send_text(0x5999, version)
+    with open(VERS_PATH, "r") as f:
+        version = f.read().strip()
+    print(f"Версия программы: {version}")
+
+    int_version = int(version)  
+    int_write(0x5999, int_version)
 
     params = load_params("param.json")
     HP = params["HP"]
@@ -238,7 +236,7 @@ def main():
             int_write(0x5001, RD)
             int_write(0x5301, antirad)
             int_write(0x5302, vodka)
-            int_write(0x5999, version)
+            int_write(0x5999, int_version)
             print(f'HP = {HP}, RD = {RD}')
 
             if changed:
