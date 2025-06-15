@@ -21,9 +21,9 @@ uart.RD = RD
 uart.antirad = antirad
 uart.vodka = vodka
 uart.bint = bint
-uart.bint = apteka20
-uart.bint = apteka30
-uart.bint = apteka50
+uart.apteka20 = apteka20
+uart.apteka30 = apteka30
+uart.apteka50 = apteka50
 uart.params = params
 
 oasis = False
@@ -205,9 +205,9 @@ def main():
     uart.antirad = antirad
     uart.vodka = vodka
     uart.bint = bint
-    uart.bint = apteka20
-    uart.bint = apteka30
-    uart.bint = apteka50
+    uart.apteka20 = apteka20
+    uart.apteka30 = apteka30
+    uart.apteka50 = apteka50
     uart.params = params
 
     buffer = bytearray()
@@ -269,7 +269,7 @@ def main():
             int_write(0x5001, RD)
             int_write(0x5301, antirad)
             int_write(0x5302, vodka)
-            int_write(0x5302, bint)
+            int_write(0x5308, bint)
             int_write(0x5309, apteka20)
             int_write(0x5310, apteka30)
             int_write(0x5311, apteka50)
