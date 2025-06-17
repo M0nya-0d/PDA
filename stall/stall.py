@@ -3,7 +3,7 @@ import time
 import json
 import uart
 
-
+number_pda = 0
 HP = 0
 RD = 0
 rd_up = 0
@@ -144,7 +144,7 @@ def save_params(filename, data):
         json.dump(data, f, indent=4)
 
 def main():
-    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50
+    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, number_pda
 
     ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=0.01)
 
@@ -171,17 +171,25 @@ def main():
         print("Отправляется пакет:", packet.hex())
         ser.write(packet)
 
+    with open("number.txt", "r") as f:
+        number_pda = int(f.read().strip())
+        number_key = str(number_pda)
+        all_params = load_params("param.json")
+        if number_key in all_params:
+            params = all_params[number_key]
+            current_nik = params.get("Nik-name", "noname")
+            print(f"Nik-name найден: {current_nik}")
+        else:
+            print(f"Ошибка: номер {number_pda} не найден в param.json")
+            return
+        
     with open(VERS_PATH, "r") as f:
         version = f.read().strip()
-    print(f"Версия программы: {version}")
-
     int_version = int(version)  
     int_write(0x5999, int_version)
 
 
-    current_nik = "vas9"
-    all_params = load_params("param.json")
-    params = all_params[current_nik]
+
     HP = params["HP"]
     RD = params["RD"]
     for med in params.get("Medicina", []):
@@ -292,7 +300,7 @@ def main():
                 save_counter += 1
                 if save_counter >= 10:
                     save_counter = 0
-                    all_params[current_nik] = params
+                    all_params[number_key] = params
                     save_params("param.json", all_params)
                     print("Сохранено в param.json после изменений")
             else:
