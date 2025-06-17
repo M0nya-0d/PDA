@@ -178,7 +178,10 @@ def main():
     int_version = int(version)  
     int_write(0x5999, int_version)
 
-    params = load_params("param.json")
+
+    current_nik = "vas9"
+    all_params = load_params("param.json")
+    params = all_params[current_nik]
     HP = params["HP"]
     RD = params["RD"]
     for med in params.get("Medicina", []):
@@ -289,7 +292,8 @@ def main():
                 save_counter += 1
                 if save_counter >= 10:
                     save_counter = 0
-                    save_params("param.json", params)
+                    all_params[current_nik] = params
+                    save_params("param.json", all_params)
                     print("Сохранено в param.json после изменений")
             else:
                 save_counter = 0
