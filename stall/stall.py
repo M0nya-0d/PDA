@@ -133,6 +133,7 @@ def update_hp_rd(HP, RD):
             if HP > 10000:
                 HP = 10000
     changed = (HP != orig_HP) or (RD != orig_RD)
+    print(f"[DEBUG] update_hp_rd: orig_HP={orig_HP}, orig_RD={orig_RD}, new_HP={HP}, new_RD={RD}, changed={changed}")
     return HP, RD, changed, send_packets
 
 
