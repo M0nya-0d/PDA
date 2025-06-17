@@ -108,8 +108,8 @@ def update_hp_rd(HP, RD):
             if rd_up >= 2:
                 RD -= 1
                 rd_up = 0
-            if hp_up >= 2:    
-                HP -= 5
+            if hp_up >= 1:    
+                HP -= 2
                 hp_up = 0
                 if HP <= 0:
                     norma = False
@@ -303,9 +303,8 @@ def main():
             print(f'HP = {HP}, RD = {RD}')
 
             if changed:
-                need_save = True
                 save_counter += 1
-                if save_counter >= 10:
+                if save_counter >= 5:
                     save_counter = 0
                     number_key = str(number_pda)
                     if number_key not in all_params:
