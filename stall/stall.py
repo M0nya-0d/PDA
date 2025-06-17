@@ -174,7 +174,7 @@ def main():
         print("Отправляется пакет:", packet.hex())
         ser.write(packet)
 
-    with open("number.txt", "r") as f:
+    with open("/home/orangepi/PDA/number.txt", "r") as f:
         number_pda = int(f.read().strip())
         number_key = str(number_pda)
         all_params = load_params("/home/orangepi/PDA/stall/param.json")
@@ -307,9 +307,29 @@ def main():
                 save_counter += 1
                 if save_counter >= 10:
                     save_counter = 0
-                    all_params[number_key] = params
-                    save_params("param.json", all_params)
-                    print("Сохранено в param.json после изменений")
+                    number_key = str(number_pda)
+                    if number_key not in all_params:
+                        all_params[number_key] = {}
+                    all_params[number_key]["HP"] = HP 
+                    all_params[number_key]["RD"] = RD 
+                    known_meds = {  
+                        "Antirad": antirad,
+                        "Vodka": vodka,
+                        "Bint": bint,
+                        "Apteka20": apteka20,
+                        "Apteka30": apteka30,
+                        "Apteka50": apteka50
+                    } 
+                    new_meds = []  
+                    for med in params.get("Medicina", []): 
+                        name = med["name"]
+                        count = known_meds.get(name, med["count"])
+                        new_meds.append({"name": name, "count": count})
+                    all_params[number_key]["Medicina"] = new_meds    
+                    save_params("/home/orangepi/PDA/stall/param.json", all_params)    
+                    #all_params[number_key] = params
+                    #save_params("param.json", all_params)
+                    #print("Сохранено в param.json после изменений")
             else:
                 save_counter = 0
                 need_save = False
