@@ -1,5 +1,6 @@
 import serial
 import time
+import subprocess
 
 serial_port = "/dev/ttyS5"
 baud_rate = 115200
@@ -89,14 +90,25 @@ def process_packet(packet, send_text, int_write):
                     if result.returncode == 0:
                         print("🌐 Интернет доступен")
                         int_write(0x5950, 1)
-                        int_write(0x5980, 1)
+                        int_write(0x5980, 1)                            
                     else:
                         int_write(0x5950, 0)
-                        int_write(0x5950, 0)
+                        int_write(0x5980, 0)
                         print("❌ Нет интернета")
 
                 except Exception as e:
                     print(f"❌ Ошибка при отправке: {e}")
+            elif vp == 0x5940 and value == 1:
+                import subprocess
+                result = subprocess.run(['ping', '-c', '1', '-W', '1', '8.8.8.8'],
+                                        stdout=subprocess.DEVNULL)
+                if result.returncode == 0:
+                    try:
+                        subprocess.run(['/bin/bash', '/home/PDA/update_pda.sh'], check=True)
+                    except subprocess.CalledProcessError as e:
+                        print(f"❌ Ошибка при запуске update_pda.sh: {e}")
+                else:
+                    print("❌ Интернет недоступен, обновление отменено")
             else:
                 print(f"VP 0x{vp:04X}: значение {value}")
         else:
