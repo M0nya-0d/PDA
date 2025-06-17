@@ -177,7 +177,6 @@ def main():
     with open("/home/orangepi/PDA/number.txt", "r") as f:
         number_pda = int(f.read().strip())
         number_key = str(number_pda)
-        all_params = load_params("/home/orangepi/PDA/stall/param.json")
         if number_key in all_params:
             params = all_params[number_key]
             current_nik = params.get("Nik-name", "noname")
