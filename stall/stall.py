@@ -251,7 +251,7 @@ def main():
                 plen = buffer[2]
                 if len(buffer) >= plen + 3:
                     packet = buffer[:plen + 3]
-                    uart.process_packet(packet) # забрал после юарта
+                    uart.process_packet(packet, send_text, int_write) # забрал после юарта
                     HP = uart.HP
                     RD = uart.RD
                     antirad = uart.antirad
