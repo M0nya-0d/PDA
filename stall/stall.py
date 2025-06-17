@@ -3,6 +3,8 @@ import time
 import json
 import uart
 
+
+current_nik = "vasy"
 number_pda = 0
 HP = 0
 RD = 0
@@ -24,6 +26,7 @@ uart.bint = bint
 uart.apteka20 = apteka20
 uart.apteka30 = apteka30
 uart.apteka50 = apteka50
+uart.current_nik = current_nik
 uart.params = params
 
 oasis = False
@@ -144,7 +147,7 @@ def save_params(filename, data):
         json.dump(data, f, indent=4)
 
 def main():
-    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, number_pda
+    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, number_pda, current_nik
 
     ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=0.01)
 
@@ -179,6 +182,7 @@ def main():
             params = all_params[number_key]
             current_nik = params.get("Nik-name", "noname")
             print(f"Nik-name найден: {current_nik}")
+            uart.send_text = send_text
         else:
             print(f"Ошибка: номер {number_pda} не найден в param.json")
             return
@@ -219,6 +223,8 @@ def main():
     uart.apteka20 = apteka20
     uart.apteka30 = apteka30
     uart.apteka50 = apteka50
+    uart.current_nik = current_nik
+    uart.send_text = send_text
     uart.params = params
 
     buffer = bytearray()

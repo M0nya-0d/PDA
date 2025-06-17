@@ -5,7 +5,7 @@ serial_port = "/dev/ttyS5"
 baud_rate = 115200
 
 def process_packet(packet):
-    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50
+    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, current_nik
     if packet[0] == 0x5A and packet[1] == 0xA5:
         if len(packet) >= 9 and packet[3] == 0x83:
             vp = (packet[4] << 8) | packet[5]
@@ -97,7 +97,16 @@ def process_packet(packet):
                         if HP > 10000: HP = 10000
                         if RD < 0: RD = 0
                     else:
-                         print("Нет Аптека50 в запасе!")   
+                         print("Нет Аптека50 в запасе!")
+            elif vp == 0x5950:
+                if 'send_text' in globals():
+                    try:
+                        send_text(0x5970, current_nik)
+                        print(f"📤 Ник '{current_nik}' отправлен в 0x5970")
+                    except Exception as e:
+                        print(f"❌ Ошибка при отправке ника: {e}")
+                else:
+                    print("⚠️ send_text не задан")                            
             else:
                 print(f"VP 0x{vp:04X}: значение {value}")
         else:
