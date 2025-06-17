@@ -1,4 +1,6 @@
 #!/bin/bash
+pkill -f stall.py                  # Остановить stall.py, если работает
+sleep 1
 
 REPO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_URL="https://raw.githubusercontent.com/M0nya-0d/PDA/master/vers.txt"
@@ -43,7 +45,7 @@ else
 
     # Запускаем основной скрипт, если нужно
     if [ -x "$REPO_DIR/run.sh" ]; then
-        echo "🚀 Запуск run.sh..."
-        "$REPO_DIR/run.sh"
+        echo "🚀 Запуск stall.py..."
+        exec python3 "$REPO_DIR/stall/stall.py"
     fi
 fi
