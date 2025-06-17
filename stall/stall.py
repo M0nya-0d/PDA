@@ -183,6 +183,7 @@ def main():
             current_nik = params.get("Nik-name", "noname")
             print(f"Nik-name найден: {current_nik}")
             uart.send_text = send_text
+            uart.number_pda = number_pda
         else:
             print(f"Ошибка: номер {number_pda} не найден в param.json")
             return
