@@ -46,6 +46,6 @@ else
     # Запускаем основной скрипт, если нужно
     
     echo "🚀 Запуск stall.py..."
-    exec python3 "$REPO_DIR/stall/stall.py"
+    #exec python3 "$REPO_DIR/stall/stall.py"
     
 fi
