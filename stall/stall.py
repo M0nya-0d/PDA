@@ -148,7 +148,7 @@ def save_params(filename, data):
 
 def main():
     global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, number_pda, current_nik
-
+    all_params = load_params("/home/orangepi/PDA/stall/param.json")
     ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=0.01)
 
     def int_write(addr, num):
@@ -329,7 +329,7 @@ def main():
                     save_params("/home/orangepi/PDA/stall/param.json", all_params)    
                     #all_params[number_key] = params
                     #save_params("param.json", all_params)
-                    #print("Сохранено в param.json после изменений")
+                    print("Сохранено в param.json после изменений")
             else:
                 save_counter = 0
                 need_save = False
