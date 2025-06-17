@@ -44,8 +44,8 @@ else
     echo "✅ Уже последняя версия."
 
     # Запускаем основной скрипт, если нужно
-    if [ -x "$REPO_DIR/run.sh" ]; then
-        echo "🚀 Запуск stall.py..."
-        exec python3 "$REPO_DIR/stall/stall.py"
-    fi
+    
+    echo "🚀 Запуск stall.py..."
+    exec python3 "$REPO_DIR/stall/stall.py"
+    
 fi
