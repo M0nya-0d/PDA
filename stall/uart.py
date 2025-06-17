@@ -104,7 +104,7 @@ def process_packet(packet, send_text, int_write):
                                         stdout=subprocess.DEVNULL)
                 if result.returncode == 0:
                     try:
-                        subprocess.run(['/bin/bash', '/home/PDA/update_pda.sh'], check=True)
+                        subprocess.run(['/bin/bash', '/home/orangepi/PDA/update_pda.sh'], check=True)
                     except subprocess.CalledProcessError as e:
                         print(f"❌ Ошибка при запуске update_pda.sh: {e}")
                 else:
