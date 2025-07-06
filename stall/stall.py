@@ -2,6 +2,7 @@ import serial
 import time
 import json
 import uart
+import select
 
 
 current_nik = "vasy"
@@ -32,6 +33,9 @@ uart.params = params
 oasis = False
 norma = True
 
+jdy_port = "/dev/ttyS1"
+jdy_baud = 9600
+jdy_ser = serial.Serial(jdy_port, baudrate=jdy_baud, timeout=0.01)
 serial_port = "/dev/ttyS5"
 baud_rate = 115200
 VERS_PATH = "/home/orangepi/PDA/vers.txt"
@@ -236,32 +240,27 @@ def main():
     need_save = False
 
     while True:
-        data = ser.read(1)
-        if data:
-            buffer += data
-            if len(buffer) < 32:
-                tcount = 5
-            last_byte_time = time.time()
-        else:
-            if tcount > 0 and (time.time() - last_byte_time) > 0.002:
-                tcount -= 1
-                last_byte_time = time.time()
-        if tcount == 0 and len(buffer) > 0:
-            if len(buffer) >= 3 and buffer[0] == 0x5A and buffer[1] == 0xA5:
-                plen = buffer[2]
-                if len(buffer) >= plen + 3:
-                    packet = buffer[:plen + 3]
-                    uart.process_packet(packet, send_text, int_write) # забрал после юарта
-                    HP = uart.HP
-                    RD = uart.RD
-                    antirad = uart.antirad
-                    vodka = uart.vodka
-                    bint = uart.bint
-                    apteka20 = uart.apteka20
-                    apteka30 = uart.apteka30
-                    apteka50 = uart.apteka50
-                    params = uart.params
-            buffer = bytearray()
+        rlist, _, _ = select.select([ser, jdy_ser], [], [], 0.01)
+        for s in rlist:
+            if s == ser:
+                data = ser.read(1)
+                if data:
+                    buffer += data
+                    if len(buffer) >= 3 and buffer[0] == 0x5A and buffer[1] == 0xA5:
+                        plen = buffer[2]
+                        if len(buffer) >= plen + 3:
+                            packet = buffer[:plen + 3]
+                            uart.process_packet(packet, send_text, int_write)
+                            HP, RD = uart.HP, uart.RD
+                            antirad, vodka = uart.antirad, uart.vodka
+                            bint = uart.bint
+                            apteka20, apteka30, apteka50 = uart.apteka20, uart.apteka30, uart.apteka50
+                            params = uart.params
+                            buffer = bytearray()
+            elif s == jdy_ser:
+                jdy_data = jdy_ser.read(jdy_ser.in_waiting or 1)
+                if jdy_data:
+                    print(f"[JDY-40] 📶 Получено: {jdy_data.decode(errors='ignore')}")    
 
         now = time.monotonic()
         if now - last_update >= 1.0:
