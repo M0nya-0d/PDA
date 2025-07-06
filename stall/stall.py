@@ -33,7 +33,7 @@ uart.params = params
 oasis = False
 norma = True
 
-jdy_port = "/dev/ttyS1"
+jdy_port = "/dev/ttyS3"
 jdy_baud = 9600
 jdy_ser = serial.Serial(jdy_port, baudrate=jdy_baud, timeout=0.01)
 serial_port = "/dev/ttyS5"
