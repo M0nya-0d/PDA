@@ -3,6 +3,9 @@
     "Nik-name": "vas9",
     "HP": 4500,
     "RD": 7200,
+    "PSY": 10,
+    "Anomaly": 20,
+    "Radic": 30,
     "Medicina": [
       {"name": "B190", "count": 2},
       {"name": "Antirad", "count": 2},
@@ -11,13 +14,22 @@
       {"name": "Bint", "count": 2},
       {"name": "Apteka20", "count": 2},
       {"name": "Apteka30", "count": 2},
-      {"name": "Apteka50", "count": 2}
+      {"name": "Apteka50", "count": 2},
+      {"name": "Jacket", "count": 1},
+      {"name": "Merc", "count": 1},
+      {"name": "Exoskeleton", "count": 1},
+      {"name": "Seva", "count": 1},
+      {"name": "Stalker", "count": 1},
+      {"name": "Ecologist", "count": 1}
     ]
   },
   "71": {
     "Nik-name": "pet9",
     "HP": 4500,
-    "RD": 4200,
+    "RD": 7200,
+    "PSY": 0,
+    "Anomaly": 0,
+    "Radic": 0,
     "Medicina": [
       {"name": "B190", "count": 2},
       {"name": "Antirad", "count": 2},
@@ -26,7 +38,13 @@
       {"name": "Bint", "count": 2},
       {"name": "Apteka20", "count": 2},
       {"name": "Apteka30", "count": 2},
-      {"name": "Apteka50", "count": 2}
+      {"name": "Apteka50", "count": 2},
+      {"name": "Jacket", "count": 1},
+      {"name": "Merc", "count": 1},
+      {"name": "Exoskeleton", "count": 1},
+      {"name": "Seva", "count": 1},
+      {"name": "Stalker", "count": 1},
+      {"name": "Ecologist", "count": 1}
     ]
   }
 }

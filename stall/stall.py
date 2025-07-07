@@ -9,6 +9,9 @@ current_nik = "vasy"
 number_pda = 0
 HP = 0
 RD = 0
+arm_psy = 0
+arm_rad = 0
+arm_anom = 0
 rd_up = 0
 hp_up = 0
 radic_up = 0
@@ -20,10 +23,19 @@ bint = 0
 apteka20 = 0
 apteka30 = 0
 apteka50 = 0
+Jacket = 0
+Merc = 0
+Exoskeleton = 0
+Seva = 0
+Stalker = 0
+Ecologist = 0
 params = {}
 
 uart.HP = HP
 uart.RD = RD
+uart.arm_psy = arm_psy
+uart.arm_rad = arm_rad
+uart.arm_anom = arm_anom
 uart.antirad = antirad
 uart.vodka = vodka
 uart.bint = bint
@@ -197,7 +209,7 @@ def save_params(filename, data):
         json.dump(data, f, indent=4)
 
 def main():
-    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, number_pda, current_nik
+    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, number_pda, current_nik, arm_anom, arm_psy, arm_rad, Jacket
     all_params = load_params("/home/orangepi/PDA/stall/param.json")
     ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=0.01)
 
@@ -246,6 +258,9 @@ def main():
 
     HP = params["HP"]
     RD = params["RD"]
+    arm_psy = params["PSY"]
+    arm_rad = params["Radic"]
+    arm_anom = params["Anomaly"]
     for med in params.get("Medicina", []):
         if med["name"] == "Antirad":
             antirad = med["count"]
@@ -263,10 +278,17 @@ def main():
             apteka30 = med["count"]
     for med in params.get("Medicina", []):
         if med["name"] == "Apteka50":
-            apteka50 = med["count"]                                   
+            apteka50 = med["count"]
+    for med in params.get("Medicina", []):
+        if med["name"] == "Jacket":
+            Jacket = med["count"]
+                                   
 
     uart.HP = HP
     uart.RD = RD
+    uart.arm_psy = arm_psy
+    uart.arm_rad = arm_rad
+    uart.arm_anom = arm_anom
     uart.antirad = antirad
     uart.vodka = vodka
     uart.bint = bint
@@ -312,7 +334,7 @@ def main():
                     if decoded == "Oasis":
                         resp()
                     if decoded == "Anomaly":
-                        anomali()          
+                        anomaly()          
 
         now = time.monotonic()
         if now - last_update >= 1.0:
@@ -322,6 +344,9 @@ def main():
             uart.RD = RD
             params["HP"] = HP
             params["RD"] = RD
+            params["PSY"] = arm_psy
+            params["Radic"] = arm_rad
+            params["Anomaly"] = arm_anom
             for med in params.get("Medicina", []): # записал в файл
                 if med["name"] == "Antirad":
                     med["count"] = antirad
@@ -334,7 +359,10 @@ def main():
                 elif med["name"] == "Apteka30":
                     med["count"] = apteka30
                 elif med["name"] == "Apteka50":
-                    med["count"] = apteka50  
+                    med["count"] = apteka50
+                elif med["name"] == "Jacket":
+                    med["count"] = Jacket
+      
             for packet in packets:   # обновляю на экран
                 ser.write(packet)
             int_write(0x5000, HP)
@@ -345,6 +373,8 @@ def main():
             int_write(0x5309, apteka20)
             int_write(0x5310, apteka30)
             int_write(0x5311, apteka50)
+            int_write(0x5312, Jacket)
+            int_write(0x5321, arm_rad)
             int_write(0x5999, int_version)
 
             now_time = time.strftime("%H%M", time.localtime())
@@ -361,7 +391,10 @@ def main():
                 if number_key not in all_params:
                     all_params[number_key] = {}
                 all_params[number_key]["HP"] = HP 
-                all_params[number_key]["RD"] = RD 
+                all_params[number_key]["RD"] = RD
+                all_params[number_key]["PSY"] = arm_psy
+                all_params[number_key]["Anomaly"] = arm_anom
+                all_params[number_key]["Radic"] = arm_rad 
                 known_meds = {  
                     "Antirad": antirad,
                     "Vodka": vodka,
