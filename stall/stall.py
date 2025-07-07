@@ -42,6 +42,7 @@ uart.bint = bint
 uart.apteka20 = apteka20
 uart.apteka30 = apteka30
 uart.apteka50 = apteka50
+uart.Jacket = Jacket
 uart.current_nik = current_nik
 uart.params = params
 
@@ -295,6 +296,7 @@ def main():
     uart.apteka20 = apteka20
     uart.apteka30 = apteka30
     uart.apteka50 = apteka50
+    uart.Jacket = Jacket
     uart.current_nik = current_nik
     uart.send_text = send_text
     uart.params = params
