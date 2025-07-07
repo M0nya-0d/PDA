@@ -8,14 +8,14 @@ baud_rate = 115200
 
 def process_packet(packet, send_text, int_write):
     global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, current_nik, number_pda, arm_rad, Jacket
-
+    default_return = (HP, RD, Jacket, arm_rad)
     if not (packet[0] == 0x5A and packet[1] == 0xA5):
         print("Пакет не DWIN или нераспознан")
-        return
+        return HP, RD, Jacket, arm_rad
 
     if len(packet) < 9 or packet[3] != 0x83:
         print("Пакет нераспознан или слишком короткий:", packet.hex())
-        return
+        return HP, RD, Jacket, arm_rad
 
     vp = (packet[4] << 8) | packet[5]
     value = packet[8]
@@ -74,7 +74,7 @@ def process_packet(packet, send_text, int_write):
             elif name == "Apteka50":
                 apteka50 = count
             elif name == "Jacket":
-                arm_rad += 10
+                arm_rad = 10
                 params["Radic"] = arm_rad
                 Jacket = count
                 uart.Jacket = Jacket  # <-- ЭТО ОЧЕНЬ ВАЖНО
@@ -116,3 +116,4 @@ def process_packet(packet, send_text, int_write):
 
     else:
         print(f"VP 0x{vp:04X}: значение {value}")
+    return HP, RD, Jacket, arm_rad    

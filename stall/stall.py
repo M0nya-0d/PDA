@@ -320,7 +320,7 @@ def main():
                         if len(buffer) >= plen + 3:
                             packet = buffer[:plen + 3]
                             uart.process_packet(packet, send_text, int_write)
-                            HP, RD = uart.HP, uart.RD
+                            HP, RD, Jacket, arm_rad = uart.process_packet(packet, send_text, int_write)
                             antirad, vodka = uart.antirad, uart.vodka
                             bint = uart.bint
                             apteka20, apteka30, apteka50 = uart.apteka20, uart.apteka30, uart.apteka50
