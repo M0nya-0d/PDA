@@ -98,22 +98,23 @@ def update_hp_rd(HP, RD):
             flag_anomaly = False
             anomaly_up = 0    
 
-    if oasis:
-        norma = False
-        send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x01]))
-        oasis_up += 1
-        if oasis_up >= 1:
-            if RD > 0:
-                RD = 0
-            HP += 9
-            if HP > 8000:
-                HP = 8000
-                oasis = False
-                norma = True
-                send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x00]))
-        if oasis_up >= 6:
-            oasis_up = 0
-            oasis = False        
+    if oasis and norma == False:
+        if HP < 8000:
+            norma = False
+            send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x01]))
+            oasis_up += 1
+            if oasis_up >= 1:
+                if RD > 0:
+                    RD = 0
+                HP += 9
+                if HP >= 8000:
+                    HP = 8000
+                    oasis = False
+                    norma = True
+                    send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x00]))
+            if oasis_up >= 6:
+                oasis_up = 0
+                oasis = False        
     if norma:
         if RD > 0 and RD <= 1000:
             if rd_up >= 3:
@@ -132,7 +133,8 @@ def update_hp_rd(HP, RD):
                 hp_up = 0
                 if HP <= 0:
                     norma = False
-                    HP = 0 
+                    HP = 0
+                    RD = 0 
                     send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x0A]))   
         elif RD > 4000 and RD <= 7000:
             if rd_up >= 2:
@@ -144,12 +146,14 @@ def update_hp_rd(HP, RD):
                 if HP <= 0:
                     norma = False
                     HP = 0
+                    RD = 0
                     send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x0A]))
         elif RD > 7000 and RD <= 8000:
             HP -= 10
             if HP <= 0:
                 norma = False
                 HP = 0
+                RD = 0
                 send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x0A]))
         elif RD > 8000 and RD <= 15000:
             HP -= 50
