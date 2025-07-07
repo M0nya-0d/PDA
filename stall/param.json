@@ -3,9 +3,9 @@
     "Nik-name": "vas9",
     "HP": 4500,
     "RD": 7200,
-    "PSY": 10,
-    "Anomaly": 20,
-    "Radic": 30,
+    "PSY": 0,
+    "Anomaly": 0,
+    "Radic": 0,
     "Medicina": [
       {"name": "B190", "count": 2},
       {"name": "Antirad", "count": 2},

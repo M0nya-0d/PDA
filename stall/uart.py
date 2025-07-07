@@ -20,10 +20,10 @@ def process_packet(packet, send_text, int_write):
     value = packet[8]
 
     # === Jacket (arm_rad += 10) ===
-    if vp == 0x5651 and value == 1:
-        print("🛡️ Используем Jacket — добавляем защиту от радиации")
-        arm_rad += 10
-        return
+    #if vp == 0x5651 and value == 1:
+    #    print("🛡️ Используем Jacket — добавляем защиту от радиации")
+    #    arm_rad += 10
+    #    return
 
     # === Медикаменты ===
     med_actions = {
@@ -74,6 +74,7 @@ def process_packet(packet, send_text, int_write):
                 apteka50 = count
             elif name == "Jacket":
                 arm_rad += 10
+                params["Radic"] = arm_rad
                 Jacket = count
     
         else:
