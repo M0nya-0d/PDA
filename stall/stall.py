@@ -12,6 +12,8 @@ RD = 0
 rd_up = 0
 hp_up = 0
 radic_up = 0
+anomaly_up = 0
+oasis_up = 0
 antirad = 0
 vodka = 0
 bint = 0
@@ -34,6 +36,7 @@ uart.params = params
 oasis = False
 norma = True
 flag_radic = False
+flag_anomaly = False
 
 jdy_port = "/dev/ttyS1"
 jdy_baud = 9600
@@ -70,7 +73,7 @@ def send_text(addr, text):
         ser.write(packet)
 
 def update_hp_rd(HP, RD):
-    global rd_up, hp_up, oasis, norma, flag_radic, radic_up
+    global rd_up, hp_up, oasis, norma, flag_radic, flag_anomaly, radic_up, oasis_up, anomaly_up
     rd_up += 1
     hp_up += 1
     orig_HP, orig_RD = HP, RD
@@ -79,26 +82,38 @@ def update_hp_rd(HP, RD):
     #    norma = False
     #   HP = 0
         #send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
-    if flag_radic:
-        send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x15]))
+    if flag_radic and norma:
+        send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x16]))
         radic_up += 1
         if radic_up >= 5:
             send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x00]))
             flag_radic = False
             radic_up = 0
-        
+
+    if flag_anomaly and norma:
+        send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x02]))
+        anomaly_up += 1
+        if anomaly_up >= 5:
+            send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x00]))
+            flag_anomaly = False
+            anomaly_up = 0    
 
     if oasis:
         norma = False
         send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x01]))
-        if RD > 0:
-            RD = 0
-        HP += 9
-        if HP > 8000:
-            HP = 8000
-            oasis = False
-            norma = True
-            send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x00]))
+        oasis_up += 1
+        if oasis_up >= 1:
+            if RD > 0:
+                RD = 0
+            HP += 9
+            if HP > 8000:
+                HP = 8000
+                oasis = False
+                norma = True
+                send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x00]))
+        if oasis_up >= 6:
+            oasis_up = 0
+            oasis = False        
     if norma:
         if RD > 0 and RD <= 1000:
             if rd_up >= 3:
@@ -152,10 +167,21 @@ def update_hp_rd(HP, RD):
     return HP, RD, changed, send_packets
 
 def radic():
-    global RD, flag_radic
+    global RD, HP, flag_radic
     flag_radic = True
-    RD += 50
+    RD += 100
+    HP -= 50
 
+def resp():
+    global oasis, oasis_up
+    oasis_up = 1
+    oasis = True
+
+def anomaly():
+    global RD, HP, flag_anomaly
+    flag_anomaly = True
+    RD += 100
+    HP -= 50
 
 def load_params(filename):
     with open(filename, "r") as f:
@@ -278,7 +304,11 @@ def main():
                     decoded = jdy_data.decode(errors='ignore').strip()
                     print(f"[JDY-40] 📶 Получено: {decoded}")
                     if decoded == "Radic-1":
-                        radic()    
+                        radic()  
+                    if decoded == "Oasis":
+                        resp()
+                    if decoded == "Anomaly":
+                        anomali()          
 
         now = time.monotonic()
         if now - last_update >= 1.0:
