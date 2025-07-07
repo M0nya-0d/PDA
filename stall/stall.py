@@ -403,7 +403,8 @@ def main():
                     "Bint": bint,
                     "Apteka20": apteka20,
                     "Apteka30": apteka30,
-                    "Apteka50": apteka50
+                    "Apteka50": apteka50,
+                    "Jacket": Jacket
                 } 
                 new_meds = []  
                 for med in params.get("Medicina", []): 
