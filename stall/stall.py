@@ -33,7 +33,7 @@ uart.params = params
 oasis = False
 norma = True
 
-jdy_port = "/dev/ttyS3"
+jdy_port = "/dev/ttyS1"
 jdy_baud = 9600
 jdy_ser = serial.Serial(jdy_port, baudrate=jdy_baud, timeout=0.01)
 serial_port = "/dev/ttyS5"
@@ -139,7 +139,9 @@ def update_hp_rd(HP, RD):
     changed = (HP != orig_HP) or (RD != orig_RD)
     print(f"[DEBUG] update_hp_rd: orig_HP={orig_HP}, orig_RD={orig_RD}, new_HP={HP}, new_RD={RD}, changed={changed}")
     return HP, RD, changed, send_packets
-
+def radic():
+    global RD
+    RD += 50
 
 
 def load_params(filename):
@@ -260,7 +262,10 @@ def main():
             elif s == jdy_ser:
                 jdy_data = jdy_ser.read(jdy_ser.in_waiting or 1)
                 if jdy_data:
-                    print(f"[JDY-40] 📶 Получено: {jdy_data.decode(errors='ignore')}")    
+                    decoded = jdy_data.decode(errors='ignore').strip()
+                    print(f"[JDY-40] 📶 Получено: {decoded}")
+                    if decoded == "Radic-1":
+                        radic()    
 
         now = time.monotonic()
         if now - last_update >= 1.0:
