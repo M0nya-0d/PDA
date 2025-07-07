@@ -1,6 +1,7 @@
 import serial
 import time
 import subprocess
+import uart
 
 serial_port = "/dev/ttyS5"
 baud_rate = 115200
@@ -76,6 +77,8 @@ def process_packet(packet, send_text, int_write):
                 arm_rad += 10
                 params["Radic"] = arm_rad
                 Jacket = count
+                uart.Jacket = Jacket  # <-- ЭТО ОЧЕНЬ ВАЖНО
+                uart.arm_rad = arm_rad
     
         else:
             print(f"Нет {name} в запасе!")
