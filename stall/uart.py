@@ -44,7 +44,8 @@ def process_packet(packet, send_text, int_write):
             "Bint": bint,
             "Apteka20": apteka20,
             "Apteka30": apteka30,
-            "Apteka50": apteka50
+            "Apteka50": apteka50,
+            "Jacket": Jacket
         }.get(name, 0)
 
         if count > 0:
