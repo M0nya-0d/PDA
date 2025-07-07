@@ -11,6 +11,7 @@ HP = 0
 RD = 0
 rd_up = 0
 hp_up = 0
+radic_up = 0
 antirad = 0
 vodka = 0
 bint = 0
@@ -32,6 +33,7 @@ uart.params = params
 
 oasis = False
 norma = True
+flag_radic = False
 
 jdy_port = "/dev/ttyS1"
 jdy_baud = 9600
@@ -68,7 +70,7 @@ def send_text(addr, text):
         ser.write(packet)
 
 def update_hp_rd(HP, RD):
-    global rd_up, hp_up, oasis, norma
+    global rd_up, hp_up, oasis, norma, flag_radic, radic_up
     rd_up += 1
     hp_up += 1
     orig_HP, orig_RD = HP, RD
@@ -77,6 +79,15 @@ def update_hp_rd(HP, RD):
     #    norma = False
     #   HP = 0
         #send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
+    if flag_radic:
+        send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x0A]))
+        radic_up += 1
+        if radic_up == 4:
+            send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x00]))
+            flag_radic = False
+            radic_up = 0
+        
+
     if oasis:
         norma = False
         send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x01]))
@@ -139,8 +150,10 @@ def update_hp_rd(HP, RD):
     changed = (HP != orig_HP) or (RD != orig_RD)
     print(f"[DEBUG] update_hp_rd: orig_HP={orig_HP}, orig_RD={orig_RD}, new_HP={HP}, new_RD={RD}, changed={changed}")
     return HP, RD, changed, send_packets
+
 def radic():
-    global RD
+    global RD, flag_radic
+    flag_radic = True
     RD += 50
 
 
@@ -335,7 +348,6 @@ def main():
                 print("Сохранено в param.json после изменений")
             else:
                 save_counter = 0
-                need_save = False
 
         time.sleep(0.01)
 if __name__ == "__main__":
