@@ -5,7 +5,7 @@ import uart
 import select
 
 
-current_nik = "vasy"
+current_nik = "gggg"
 number_pda = 0
 HP = 0
 RD = 0
