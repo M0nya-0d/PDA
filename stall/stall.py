@@ -18,6 +18,7 @@ hp_up = 0
 radic_up = 0
 anomaly_up = 0
 oasis_up = 0
+regen_up = 0
 antirad = 0
 vodka = 0
 bint = 0
@@ -93,7 +94,7 @@ def send_text(addr, text):
         ser.write(packet)
 
 def update_hp_rd(HP, RD):
-    global rd_up, hp_up, oasis, norma, flag_radic, flag_anomaly, radic_up, oasis_up, anomaly_up, arm_psy, arm_anom, arm_rad, regen
+    global rd_up, hp_up, oasis, norma, flag_radic, flag_anomaly, radic_up, oasis_up, anomaly_up, arm_psy, arm_anom, arm_rad, regen, regen_up
     rd_up += 1
     hp_up += 1
     orig_HP, orig_RD = HP, RD
@@ -102,6 +103,15 @@ def update_hp_rd(HP, RD):
     #    norma = False
     #   HP = 0
         #send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
+    if not flag_anomaly and not flag_radic:
+        if regen > 0:
+            regen_up += 1
+            HP += 3
+            if HP > 10000:
+                HP = 10000
+            if regen_up >= 3:
+                regen -= 1
+                regen_up = 0           
     if flag_radic and norma:
         send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x16]))
         radic_up += 1
@@ -195,7 +205,6 @@ def update_hp_rd(HP, RD):
 def radic():
     global RD, HP, flag_radic, arm_rad
     flag_radic = True
-
     if arm_rad > 0:
         rd_change = 100 * (1 - arm_rad / 100)
         hp_change = 50 * (1 - arm_rad / 100)
@@ -213,10 +222,16 @@ def resp():
     oasis = True
 
 def anomaly():
-    global RD, HP, flag_anomaly
-    flag_anomaly = True
-    RD += 100
-    HP -= 50
+    global RD, HP, flag_anomaly, arm_anom
+    if arm_anom > 0:
+        rd_change = 100 * (1 - arm_anom / 100)
+        hp_change = 80 * (1 - arm_anom / 100)
+        RD += round(rd_change)
+        HP -= round(hp_change)
+        arm_rad = max(0, round(arm_anom - 0.1, 1))
+    else:
+        RD += 100
+        HP -= 80
 
 def load_params(filename):
     with open(filename, "r") as f:

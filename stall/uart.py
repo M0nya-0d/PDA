@@ -89,26 +89,42 @@ def process_packet(packet, send_text, int_write):
                 ##### ARMOR ############
             elif name == "Jacket":
                 arm_rad = 10
+                arm_anom = 0
+                arm_psy = 0
+                regen = 0
                 int_write(0x6010, 3) ## Номер иконки
                 params["Radic"] = arm_rad
+                params["Anomaly"] = arm_anom
+                params["PSY"] = arm_psy
+                params["Regen"] = regen
                 Jacket = count
                 uart.Jacket = Jacket  # <-- ЭТО ОЧЕНЬ ВАЖНО
                 uart.arm_rad = arm_rad
+                uart.arm_anom = arm_anom
+                uart.arm_psy = arm_psy
+                uart.regen = regen
+
             elif name == "Merc":
                 arm_rad = 20
                 arm_anom = 10
+                arm_psy = 0
+                regen = 0
                 int_write(0x6010, 4) ## Номер иконки
                 params["Radic"] = arm_rad
                 params["Anomaly"] = arm_anom
+                params["PSY"] = arm_psy
+                params["Regen"] = regen
                 Merc = count
                 uart.Merc = Merc  # <-- ЭТО ОЧЕНЬ ВАЖНО
                 uart.arm_rad = arm_rad
                 uart.arm_anom = arm_anom
+                uart.arm_psy = arm_psy
+                uart.regen = regen
             elif name == "Exoskeleton":
                 arm_rad = 30
                 arm_anom = 40
                 arm_psy = 10
-                regen = 10
+                regen = 100
                 int_write(0x6010, 0) ## Номер иконки
                 params["Radic"] = arm_rad
                 params["Anomaly"] = arm_anom
@@ -124,41 +140,50 @@ def process_packet(packet, send_text, int_write):
                 arm_rad = 50
                 arm_anom = 40
                 arm_psy = 30
+                regen = 0
                 int_write(0x6010, 2) ## Номер иконки
                 params["Radic"] = arm_rad
                 params["Anomaly"] = arm_anom
                 params["PSY"] = arm_psy
+                params["Regen"] = regen
                 Seva = count
                 uart.Seva = Seva  # <-- ЭТО ОЧЕНЬ ВАЖНО
                 uart.arm_rad = arm_rad
                 uart.arm_anom = arm_anom
                 uart.arm_psy = arm_psy
+                uart.regen = regen
             elif name == "Stalker":
                 arm_rad = 30
                 arm_anom = 20
                 arm_psy = 10
+                regen = 0
                 int_write(0x6010, 5) ## Номер иконки
                 params["Radic"] = arm_rad
                 params["Anomaly"] = arm_anom
                 params["PSY"] = arm_psy
+                params["Regen"] = regen
                 Stalker = count
                 uart.Stalker = Stalker  # <-- ЭТО ОЧЕНЬ ВАЖНО
                 uart.arm_rad = arm_rad
                 uart.arm_anom = arm_anom
                 uart.arm_psy = arm_psy
+                uart.regen = regen
             elif name == "Ecologist":
                 arm_rad = 80
                 arm_anom = 60
                 arm_psy = 40
+                regen = 0 
                 int_write(0x6010, 1) ## Номер иконки
                 params["Radic"] = arm_rad
                 params["Anomaly"] = arm_anom
                 params["PSY"] = arm_psy
+                params["Regen"] = regen
                 Ecologist = count
                 uart.Ecologist = Ecologist  # <-- ЭТО ОЧЕНЬ ВАЖНО
                 uart.arm_rad = arm_rad
                 uart.arm_anom = arm_anom
                 uart.arm_psy = arm_psy
+                uart.regen = regen
 
         else:
             print(f"Нет {name} в запасе!")
