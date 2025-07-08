@@ -77,7 +77,7 @@ def process_packet(packet, send_text, int_write):
                 apteka50 = count
             elif name == "Jacket":
                 arm_rad = 10
-                int_write(0x5990, 3)
+                int_write(0x5970, 0)
                 params["Radic"] = arm_rad
                 Jacket = count
                 uart.Jacket = Jacket  # <-- ЭТО ОЧЕНЬ ВАЖНО
@@ -85,7 +85,7 @@ def process_packet(packet, send_text, int_write):
             elif name == "Merc":
                 arm_rad = 20
                 arm_anom = 10
-                int_write(0x5990, 8)
+                int_write(0x5970, 1)
                 params["Radic"] = arm_rad
                 params["Anomaly"] = arm_anom
                 Merc = count
@@ -108,11 +108,11 @@ def process_packet(packet, send_text, int_write):
             if result.returncode == 0:
                 print("🌐 Интернет доступен")
                 int_write(0x5950, 1)
-                int_write(0x5980, 1)
+                int_write(0x5960, 1)
             else:
                 print("❌ Нет интернета")
                 int_write(0x5950, 0)
-                int_write(0x5980, 0)
+                int_write(0x5960, 0)
         except Exception as e:
             print(f"❌ Ошибка при отправке: {e}")
 
