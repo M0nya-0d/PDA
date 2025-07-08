@@ -109,7 +109,7 @@ def update_hp_rd(HP, RD):
             HP += 3
             if HP > 10000:
                 HP = 10000
-            if regen_up >= 3:
+            if regen_up >= 30:
                 regen = max(0, round(regen - 0.1, 1))
                 regen_up = 0           
     if flag_radic and norma:
@@ -228,10 +228,14 @@ def anomaly():
         hp_change = 80 * (1 - arm_anom / 100)
         RD += round(rd_change)
         HP -= round(hp_change)
-        arm_rad = max(0, round(arm_anom - 0.1, 1))
+        arm_anom = max(0, round(arm_anom - 0.1, 1))
     else:
         RD += 100
         HP -= 80
+def psy():
+    print("PSY")
+
+
 
 def load_params(filename):
     with open(filename, "r") as f:
@@ -395,7 +399,8 @@ def main():
                         resp()
                     if decoded == "Anomaly":
                         anomaly()          
-
+                    if decoded == "PSY":
+                        psy()
         now = time.monotonic()
         if now - last_update >= 1.0:
             last_update = now

@@ -1,6 +1,6 @@
 #!/bin/bash
 pkill -f stall.py                  # Остановить stall.py, если работает
-sleep 1
+sleep 3
 
 REPO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_URL="https://raw.githubusercontent.com/M0nya-0d/PDA/master/vers.txt"
