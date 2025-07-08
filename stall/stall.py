@@ -223,6 +223,7 @@ def resp():
 
 def anomaly():
     global RD, HP, flag_anomaly, arm_anom
+    flag_anomaly = True
     if arm_anom > 0:
         rd_change = 100 * (1 - arm_anom / 100)
         hp_change = 80 * (1 - arm_anom / 100)
@@ -230,7 +231,7 @@ def anomaly():
         HP -= round(hp_change)
         arm_anom = max(0, round(arm_anom - 0.1, 1))
     else:
-        RD += 100
+        RD += 150
         HP -= 80
 def psy():
     print("PSY")
