@@ -1,7 +1,6 @@
 import serial
 import time
 import subprocess
-from stall.stall import Ecologist
 import uart
 
 serial_port = "/dev/ttyS5"
