@@ -47,6 +47,9 @@ uart.apteka50 = apteka50
 uart.Jacket = Jacket
 uart.Merc = Merc
 uart.Exoskeleton = Exoskeleton
+uart.Seva = Seva
+uart.Stalker = Stalker
+uart.Ecologist = Ecologist
 uart.current_nik = current_nik
 uart.params = params
 
@@ -216,7 +219,7 @@ def save_params(filename, data):
         json.dump(data, f, indent=4)
 
 def main():
-    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, number_pda, current_nik, arm_anom, arm_psy, arm_rad, regen, Jacket, Merc, Exoskeleton
+    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, number_pda, current_nik, arm_anom, arm_psy, arm_rad, regen, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist
     all_params = load_params("/home/orangepi/PDA/stall/param.json")
     ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=0.01)
 
@@ -295,7 +298,16 @@ def main():
             Merc = med["count"]
     for med in params.get("Medicina", []):
         if med["name"] == "Exoskeleton":
-            Exoskeleton = med["count"]                               
+            Exoskeleton = med["count"] 
+    for med in params.get("Medicina", []):
+        if med["name"] == "Seva":
+            Seva = med["count"]
+    for med in params.get("Medicina", []):
+        if med["name"] == "Stalker":
+            Stalker = med["count"]
+    for med in params.get("Medicina", []):
+        if med["name"] == "Ecologist":
+            Ecologist = med["count"]                              
 
     uart.HP = HP
     uart.RD = RD
@@ -311,6 +323,9 @@ def main():
     uart.apteka50 = apteka50
     uart.Jacket = Jacket
     uart.Merc = Merc
+    uart.Seva = Seva
+    uart.Stalker = Stalker
+    uart.Ecologist = Ecologist
     uart.Exoskeleton = Exoskeleton
     uart.current_nik = current_nik
     uart.send_text = send_text
@@ -335,11 +350,14 @@ def main():
                         if len(buffer) >= plen + 3:
                             packet = buffer[:plen + 3]
                             #uart.process_packet(packet, send_text, int_write)
-                            HP, RD, Jacket, Merc, Exoskeleton, arm_rad, arm_psy, arm_anom, regen = uart.process_packet(packet, send_text, int_write)
+                            HP, RD, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, arm_rad, arm_psy, arm_anom, regen = uart.process_packet(packet, send_text, int_write)
                             antirad, vodka = uart.antirad, uart.vodka
                             bint = uart.bint
                             apteka20, apteka30, apteka50 = uart.apteka20, uart.apteka30, uart.apteka50
                             Exoskeleton = uart.Exoskeleton
+                            Seva = uart.Seva
+                            Stalker = uart.Stalker
+                            Ecologist = uart.Ecologist
                             params = uart.params
                             buffer = bytearray()
             elif s == jdy_ser:
@@ -384,7 +402,13 @@ def main():
                 elif med ["name"] == "Merc":
                     med["count"] = Merc
                 elif med ["name"] == "Exoskeleton":
-                    med ["count"] = Exoskeleton    
+                    med ["count"] = Exoskeleton
+                elif med ["name"] == "Seva":
+                    med ["count"] = Seva
+                elif med ["name"] == "Stalker":
+                    med ["count"] = Stalker
+                elif med ["name"] == "Ecologist":
+                    med ["count"] = Ecologist    
       
             for packet in packets:   # обновляю на экран
                 ser.write(packet)
@@ -399,6 +423,9 @@ def main():
             int_write(0x5312, Jacket)
             int_write(0x5313, Merc)
             int_write(0x5316, Exoskeleton)
+            int_write(0x5315, Seva)
+            int_write(0x5314, Stalker)
+            int_write(0x5317, Ecologist)
             int_write(0x5321, arm_rad)
             int_write(0x5320, regen)
             int_write(0x5323, arm_psy)
@@ -434,7 +461,10 @@ def main():
                     "Apteka50": apteka50,
                     "Jacket": Jacket,
                     "Merc": Merc,
-                    "Exoskeleton": Exoskeleton
+                    "Exoskeleton": Exoskeleton,
+                    "Seva": Seva,
+                    "Stalker": Stalker,
+                    "Ecologist": Ecologist
                 } 
                 new_meds = []  
                 for med in params.get("Medicina", []): 

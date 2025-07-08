@@ -1,21 +1,22 @@
 import serial
 import time
 import subprocess
+from stall.stall import Ecologist
 import uart
 
 serial_port = "/dev/ttyS5"
 baud_rate = 115200
 
 def process_packet(packet, send_text, int_write):
-    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, current_nik, number_pda, arm_rad, arm_psy, arm_anom, regen, Jacket, Merc, Exoskeleton
-    default_return = (HP, RD, Jacket, Merc, Exoskeleton, arm_rad, arm_psy, arm_anom, regen)
+    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, current_nik, number_pda, arm_rad, arm_psy, arm_anom, regen, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist
+    default_return = (HP, RD, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, arm_rad, arm_psy, arm_anom, regen)
     if not (packet[0] == 0x5A and packet[1] == 0xA5):
         print("Пакет не DWIN или нераспознан")
-        return HP, RD, Jacket, Merc, Exoskeleton, arm_rad, arm_psy, arm_anom, regen
+        return HP, RD, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, arm_rad, arm_psy, arm_anom, regen
 
     if len(packet) < 9 or packet[3] != 0x83:
         print("Пакет нераспознан или слишком короткий:", packet.hex())
-        return HP, RD, Jacket, Merc, Exoskeleton, arm_rad, arm_psy, arm_anom, regen
+        return HP, RD, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, arm_rad, arm_psy, arm_anom, regen
 
     vp = (packet[4] << 8) | packet[5]
     value = packet[8]
@@ -37,6 +38,9 @@ def process_packet(packet, send_text, int_write):
         0x5651: ("Jacket", 0, 0),
         0x5652: ("Merc", 0, 0),
         0x5653: ("Exoskeleton", 0, 0),
+        0x5654: ("Seva", 0, 0),
+        0x5655: ("Stalker", 0, 0),
+        0x5656: ("Ecologist", 0, 0),
 
     }
 
@@ -51,7 +55,11 @@ def process_packet(packet, send_text, int_write):
             "Apteka50": apteka50,
             "Jacket": Jacket,
             "Merc": Merc,
-            "Exoskeleton": Exoskeleton
+            "Exoskeleton": Exoskeleton,
+            "Seva": Seva,
+            "Stalker": Stalker,
+            "Ecologist": Ecologist
+
         }.get(name, 0)
 
         if count > 0:
@@ -78,9 +86,11 @@ def process_packet(packet, send_text, int_write):
                 apteka30 = count
             elif name == "Apteka50":
                 apteka50 = count
+
+                ##### ARMOR ############
             elif name == "Jacket":
                 arm_rad = 10
-                int_write(0x6010, 3)
+                int_write(0x6010, 3) ## Номер иконки
                 params["Radic"] = arm_rad
                 Jacket = count
                 uart.Jacket = Jacket  # <-- ЭТО ОЧЕНЬ ВАЖНО
@@ -88,7 +98,7 @@ def process_packet(packet, send_text, int_write):
             elif name == "Merc":
                 arm_rad = 20
                 arm_anom = 10
-                int_write(0x6010, 4)
+                int_write(0x6010, 4) ## Номер иконки
                 params["Radic"] = arm_rad
                 params["Anomaly"] = arm_anom
                 Merc = count
@@ -100,7 +110,7 @@ def process_packet(packet, send_text, int_write):
                 arm_anom = 40
                 arm_psy = 10
                 regen = 100
-                int_write(0x6010, 0)
+                int_write(0x6010, 0) ## Номер иконки
                 params["Radic"] = arm_rad
                 params["Anomaly"] = arm_anom
                 params["PSY"] = arm_psy
@@ -111,6 +121,45 @@ def process_packet(packet, send_text, int_write):
                 uart.arm_anom = arm_anom
                 uart.arm_psy = arm_psy
                 uart.regen = regen
+            elif name == "Seva":
+                arm_rad = 50
+                arm_anom = 40
+                arm_psy = 30
+                int_write(0x6010, 2) ## Номер иконки
+                params["Radic"] = arm_rad
+                params["Anomaly"] = arm_anom
+                params["PSY"] = arm_psy
+                Seva = count
+                uart.Seva = Seva  # <-- ЭТО ОЧЕНЬ ВАЖНО
+                uart.arm_rad = arm_rad
+                uart.arm_anom = arm_anom
+                uart.arm_psy = arm_psy
+            elif name == "Stalker":
+                arm_rad = 30
+                arm_anom = 20
+                arm_psy = 10
+                int_write(0x6010, 5) ## Номер иконки
+                params["Radic"] = arm_rad
+                params["Anomaly"] = arm_anom
+                params["PSY"] = arm_psy
+                Stalker = count
+                uart.Stalker = Stalker  # <-- ЭТО ОЧЕНЬ ВАЖНО
+                uart.arm_rad = arm_rad
+                uart.arm_anom = arm_anom
+                uart.arm_psy = arm_psy
+            elif name == "Ecologist":
+                arm_rad = 80
+                arm_anom = 60
+                arm_psy = 40
+                int_write(0x6010, 1) ## Номер иконки
+                params["Radic"] = arm_rad
+                params["Anomaly"] = arm_anom
+                params["PSY"] = arm_psy
+                Ecologist = count
+                uart.Ecologist = Ecologist  # <-- ЭТО ОЧЕНЬ ВАЖНО
+                uart.arm_rad = arm_rad
+                uart.arm_anom = arm_anom
+                uart.arm_psy = arm_psy
 
         else:
             print(f"Нет {name} в запасе!")
@@ -148,4 +197,4 @@ def process_packet(packet, send_text, int_write):
 
     else:
         print(f"VP 0x{vp:04X}: значение {value}")
-    return HP, RD, Jacket, Merc, Exoskeleton, arm_rad, arm_psy, arm_anom, regen    
+    return HP, RD, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, arm_rad, arm_psy, arm_anom, regen    
