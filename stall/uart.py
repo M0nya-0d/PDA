@@ -77,7 +77,7 @@ def process_packet(packet, send_text, int_write):
                 apteka50 = count
             elif name == "Jacket":
                 arm_rad = 10
-                int_write(0x5975, 0)
+                int_write(0x6010, 0)
                 params["Radic"] = arm_rad
                 Jacket = count
                 uart.Jacket = Jacket  # <-- ЭТО ОЧЕНЬ ВАЖНО
@@ -85,7 +85,7 @@ def process_packet(packet, send_text, int_write):
             elif name == "Merc":
                 arm_rad = 20
                 arm_anom = 10
-                int_write(0x5975, 1)
+                int_write(0x6010, 1)
                 params["Radic"] = arm_rad
                 params["Anomaly"] = arm_anom
                 Merc = count
