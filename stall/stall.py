@@ -46,6 +46,7 @@ uart.apteka30 = apteka30
 uart.apteka50 = apteka50
 uart.Jacket = Jacket
 uart.Merc = Merc
+uart.Exoskeleton = Exoskeleton
 uart.current_nik = current_nik
 uart.params = params
 
@@ -213,7 +214,7 @@ def save_params(filename, data):
         json.dump(data, f, indent=4)
 
 def main():
-    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, number_pda, current_nik, arm_anom, arm_psy, arm_rad, regen, Jacket, Merc
+    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, number_pda, current_nik, arm_anom, arm_psy, arm_rad, regen, Jacket, Merc, Exoskeleton
     all_params = load_params("/home/orangepi/PDA/stall/param.json")
     ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=0.01)
 
@@ -290,7 +291,9 @@ def main():
     for med in params.get("Medicina", []):
         if med["name"] == "Merc":
             Merc = med["count"]
-                                   
+    for med in params.get("Medicina", []):
+        if med["name"] == "Exoskeleton":
+            Exoskeleton = med["count"]                               
 
     uart.HP = HP
     uart.RD = RD
@@ -306,6 +309,7 @@ def main():
     uart.apteka50 = apteka50
     uart.Jacket = Jacket
     uart.Merc = Merc
+    uart.Exoskeleton = Exoskeleton
     uart.current_nik = current_nik
     uart.send_text = send_text
     uart.params = params
@@ -329,7 +333,7 @@ def main():
                         if len(buffer) >= plen + 3:
                             packet = buffer[:plen + 3]
                             #uart.process_packet(packet, send_text, int_write)
-                            HP, RD, Jacket, Merc, arm_rad, arm_psy, arm_anom, regen = uart.process_packet(packet, send_text, int_write)
+                            HP, RD, Jacket, Merc, Exoskeleton, arm_rad, arm_psy, arm_anom, regen = uart.process_packet(packet, send_text, int_write)
                             antirad, vodka = uart.antirad, uart.vodka
                             bint = uart.bint
                             apteka20, apteka30, apteka50 = uart.apteka20, uart.apteka30, uart.apteka50
@@ -376,6 +380,8 @@ def main():
                     med["count"] = Jacket
                 elif med ["name"] == "Merc":
                     med["count"] = Merc
+                elif med ["name"] == "Exoskeleton":
+                    med ["count"] = Exoskeleton    
       
             for packet in packets:   # обновляю на экран
                 ser.write(packet)
@@ -389,6 +395,7 @@ def main():
             int_write(0x5311, apteka50)
             int_write(0x5312, Jacket)
             int_write(0x5313, Merc)
+            int_write(0x5316, Exoskeleton)
             int_write(0x5321, arm_rad)
             int_write(0x5320, regen)
             int_write(0x5323, arm_psy)
@@ -423,7 +430,8 @@ def main():
                     "Apteka30": apteka30,
                     "Apteka50": apteka50,
                     "Jacket": Jacket,
-                    "Merc": Merc
+                    "Merc": Merc,
+                    "Exoskeleton": Exoskeleton
                 } 
                 new_meds = []  
                 for med in params.get("Medicina", []): 
