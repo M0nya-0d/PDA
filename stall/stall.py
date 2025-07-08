@@ -436,9 +436,9 @@ def main():
             int_write(0x5314, Stalker)
             int_write(0x5317, Ecologist)
             int_write(0x5321, int(arm_rad * 10))
-            int_write(0x5320, regen)
-            int_write(0x5323, arm_psy)
-            int_write(0x5322, arm_anom)
+            int_write(0x5320, int(regen * 10))
+            int_write(0x5323, int(arm_psy * 10))
+            int_write(0x5322, int(arm_anom * 10))
             
             int_write(0x5999, int_version)
 
