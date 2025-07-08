@@ -388,6 +388,7 @@ def main():
             int_write(0x5310, apteka30)
             int_write(0x5311, apteka50)
             int_write(0x5312, Jacket)
+            int_write(0x5313, Merc)
             int_write(0x5321, arm_rad)
             int_write(0x5320, regen)
             int_write(0x5323, arm_psy)
