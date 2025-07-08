@@ -110,7 +110,7 @@ def update_hp_rd(HP, RD):
             if HP > 10000:
                 HP = 10000
             if regen_up >= 3:
-                regen -= 1
+                regen = max(0, round(regen - 0.1, 1))
                 regen_up = 0           
     if flag_radic and norma:
         send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x16]))
