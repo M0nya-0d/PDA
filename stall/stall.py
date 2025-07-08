@@ -193,10 +193,19 @@ def update_hp_rd(HP, RD):
     return HP, RD, changed, send_packets
 
 def radic():
-    global RD, HP, flag_radic
+    global RD, HP, flag_radic, arm_rad
     flag_radic = True
-    RD += 100
-    HP -= 50
+
+    if arm_rad > 0:
+        rd_change = 100 * (1 - arm_rad / 100)
+        hp_change = 50 * (1 - arm_rad / 100)
+        RD += round(rd_change)
+        HP -= round(hp_change)
+        arm_rad = max(0, round(arm_rad - 0.1, 1))
+    else:
+        RD += 100
+        HP -= 50
+
 
 def resp():
     global oasis, oasis_up
@@ -426,7 +435,7 @@ def main():
             int_write(0x5315, Seva)
             int_write(0x5314, Stalker)
             int_write(0x5317, Ecologist)
-            int_write(0x5321, arm_rad)
+            int_write(0x5321, int(arm_rad * 10))
             int_write(0x5320, regen)
             int_write(0x5323, arm_psy)
             int_write(0x5322, arm_anom)

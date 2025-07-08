@@ -108,7 +108,7 @@ def process_packet(packet, send_text, int_write):
                 arm_rad = 30
                 arm_anom = 40
                 arm_psy = 10
-                regen = 100
+                regen = 10
                 int_write(0x6010, 0) ## Номер иконки
                 params["Radic"] = arm_rad
                 params["Anomaly"] = arm_anom
