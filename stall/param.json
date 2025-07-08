@@ -6,6 +6,7 @@
     "PSY": 0,
     "Anomaly": 0,
     "Radic": 0,
+    "Regen": 0,
     "Medicina": [
       {"name": "B190", "count": 2},
       {"name": "Antirad", "count": 2},
@@ -30,6 +31,7 @@
     "PSY": 0,
     "Anomaly": 0,
     "Radic": 0,
+    "Regen": 0,
     "Medicina": [
       {"name": "B190", "count": 2},
       {"name": "Antirad", "count": 2},

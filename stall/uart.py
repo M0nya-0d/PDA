@@ -7,15 +7,15 @@ serial_port = "/dev/ttyS5"
 baud_rate = 115200
 
 def process_packet(packet, send_text, int_write):
-    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, current_nik, number_pda, arm_rad, Jacket
-    default_return = (HP, RD, Jacket, arm_rad)
+    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, current_nik, number_pda, arm_rad, arm_psy, arm_anom, regen, Jacket, Merc
+    default_return = (HP, RD, Jacket, Merc, arm_rad, arm_psy, arm_anom, regen)
     if not (packet[0] == 0x5A and packet[1] == 0xA5):
         print("Пакет не DWIN или нераспознан")
-        return HP, RD, Jacket, arm_rad
+        return HP, RD, Jacket, Merc, arm_rad, arm_psy, arm_anom, regen
 
     if len(packet) < 9 or packet[3] != 0x83:
         print("Пакет нераспознан или слишком короткий:", packet.hex())
-        return HP, RD, Jacket, arm_rad
+        return HP, RD, Jacket, Merc, arm_rad, arm_psy, arm_anom, regen
 
     vp = (packet[4] << 8) | packet[5]
     value = packet[8]
@@ -35,6 +35,7 @@ def process_packet(packet, send_text, int_write):
         0x5602: ("Apteka30", 0, -3000),
         0x5603: ("Apteka50", 3000, -5000),
         0x5651: ("Jacket", 0, 0),
+        0x5652: ("Merc", 0, 0),
     }
 
     if vp in med_actions and value == 1:
@@ -46,7 +47,8 @@ def process_packet(packet, send_text, int_write):
             "Apteka20": apteka20,
             "Apteka30": apteka30,
             "Apteka50": apteka50,
-            "Jacket": Jacket
+            "Jacket": Jacket,
+            "Merc": Merc
         }.get(name, 0)
 
         if count > 0:
@@ -75,11 +77,22 @@ def process_packet(packet, send_text, int_write):
                 apteka50 = count
             elif name == "Jacket":
                 arm_rad = 10
+                int_write(0x5990, 3)
                 params["Radic"] = arm_rad
                 Jacket = count
                 uart.Jacket = Jacket  # <-- ЭТО ОЧЕНЬ ВАЖНО
                 uart.arm_rad = arm_rad
-    
+            elif name == "Merc":
+                arm_rad = 20
+                arm_anom = 10
+                int_write(0x5990, 8)
+                params["Radic"] = arm_rad
+                params["Anomaly"] = arm_anom
+                Merc = count
+                uart.Merc = Merc  # <-- ЭТО ОЧЕНЬ ВАЖНО
+                uart.arm_rad = arm_rad
+                uart.arm_anom = arm_anom
+
         else:
             print(f"Нет {name} в запасе!")
 
@@ -116,4 +129,4 @@ def process_packet(packet, send_text, int_write):
 
     else:
         print(f"VP 0x{vp:04X}: значение {value}")
-    return HP, RD, Jacket, arm_rad    
+    return HP, RD, Jacket, Merc, arm_rad, arm_psy, arm_anom, regen    
