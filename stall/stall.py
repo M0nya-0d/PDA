@@ -90,7 +90,7 @@ def send_text(addr, text):
         ser.write(packet)
 
 def update_hp_rd(HP, RD):
-    global rd_up, hp_up, oasis, norma, flag_radic, flag_anomaly, radic_up, oasis_up, anomaly_up
+    global rd_up, hp_up, oasis, norma, flag_radic, flag_anomaly, radic_up, oasis_up, anomaly_up, arm_psy, arm_anom, arm_rad, regen
     rd_up += 1
     hp_up += 1
     orig_HP, orig_RD = HP, RD
@@ -183,6 +183,8 @@ def update_hp_rd(HP, RD):
             HP += 1
             if HP > 10000:
                 HP = 10000
+        #elif arm_rad == 0 and arm_anom == 0 and arm_psy == 0:
+        #    int_write(0x6010, 6)
     changed = (HP != orig_HP) or (RD != orig_RD)
     print(f"[DEBUG] update_hp_rd: orig_HP={orig_HP}, orig_RD={orig_RD}, new_HP={HP}, new_RD={RD}, changed={changed}")
     return HP, RD, changed, send_packets
@@ -337,6 +339,7 @@ def main():
                             antirad, vodka = uart.antirad, uart.vodka
                             bint = uart.bint
                             apteka20, apteka30, apteka50 = uart.apteka20, uart.apteka30, uart.apteka50
+                            Exoskeleton = uart.Exoskeleton
                             params = uart.params
                             buffer = bytearray()
             elif s == jdy_ser:
