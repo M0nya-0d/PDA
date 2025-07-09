@@ -147,6 +147,7 @@ def update_hp_rd(HP, RD):
                 HP = 10000
             if regen_up >= 30:
                 regen = max(0, round(regen - 0.1, 1))
+                uart.regen = regen
                 regen_up = 0           
     if flag_radic and norma:
         send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x16]))
@@ -248,6 +249,7 @@ def radic():
             RD += round(rd_change)
             HP -= round(hp_change)
             arm_rad = max(0, round(arm_rad - 0.1, 1))
+            uart.arm_rad = arm_rad
         else:
             RD += 100
             HP -= 50
@@ -268,6 +270,7 @@ def anomaly():
             RD += round(rd_change)
             HP -= round(hp_change)
             arm_anom = max(0, round(arm_anom - 0.1, 1))
+            uart.arm_anom = arm_anom
         else:
             RD += 150
             HP -= 80
