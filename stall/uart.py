@@ -108,7 +108,7 @@ def process_packet(packet, send_text, int_write):
                 uart.block_rad = block_rad
                 
             elif name == "Drink":
-                regen = 62
+                regen = 60
                 params["Regen"] = regen
                 Drink = count
                 uart.regen = regen

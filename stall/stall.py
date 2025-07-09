@@ -137,7 +137,8 @@ def update_hp_rd(HP, RD):
             block_anom = False
             block_psy = False
             block_rad = False
-            int_write(0x6100, 0) ## Номер иконки    
+            int_write(0x6100, 0) ## Номер иконки
+            uart.block_time = block_time    
     if not flag_anomaly and not flag_radic:
         if regen > 0:
             regen_up += 1
