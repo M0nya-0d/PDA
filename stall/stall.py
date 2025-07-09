@@ -132,6 +132,7 @@ def update_hp_rd(HP, RD):
         #send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
     if block_time > 0:
         block_time -= 1
+        int_write(0x5324, block_time)
         if block_time == 0:
             block_anom = False
             block_psy = False
