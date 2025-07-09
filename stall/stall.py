@@ -39,6 +39,14 @@ Ecologist = 0
 
 block_time = 0
 
+art1 = 120
+art2 = 32
+art3 = 40
+art4 = 150
+art5 = 80
+art_up = 0
+flag_art = True
+
 oasis = False
 norma = True
 flag_radic = False
@@ -120,16 +128,37 @@ def send_text(addr, text):
     with serial.Serial(serial_port, baud_rate, timeout=1) as ser:
         ser.write(packet)
 
+def ART():
+
+
 def update_hp_rd(HP, RD):
-    global rd_up, hp_up, oasis, norma, flag_radic, flag_anomaly, radic_up, oasis_up, anomaly_up, arm_psy, arm_anom, arm_rad, regen, regen_up, block_time, block_psy, block_rad, block_anom
+    global rd_up, hp_up, oasis, norma, flag_radic, flag_anomaly, radic_up, oasis_up, anomaly_up, arm_psy, arm_anom, arm_rad, regen, regen_up, block_time, block_psy, block_rad, block_anom, art1, art2, art3, art4, art5, art_up, flag_art
     rd_up += 1
     hp_up += 1
+    if flag_art:
+        art_up += 1
     orig_HP, orig_RD = HP, RD
     send_packets = []  # Список байтовых команд, которые нужно отправить
     #if HP <= 0:
     #    norma = False
     #   HP = 0
         #send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
+    if flag_art and art_up >= 60:
+        art_values = [art1, art2, art3, art4, art5]
+        art_addresses = [0x7000, 0x7001, 0x7002, 0x7003, 0x7004]
+
+        for i in range(5):
+            if art_values[i] > 0:
+                art_values[i] -= 1
+                if art_values[i] == 0:
+                    int_write(art_addresses[i], 27)  # сменить иконку на "пусто"
+
+        art1, art2, art3, art4, art5 = art_values
+        art_up = 0
+         # Проверка: остались ли артефакты
+        if all(val == 0 for val in art_values):
+            flag_art = False   
+
     if block_time > 0:
         block_time -= 1
         int_write(0x5324, block_time)
