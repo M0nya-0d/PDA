@@ -128,7 +128,7 @@ def send_text(addr, text):
     with serial.Serial(serial_port, baud_rate, timeout=1) as ser:
         ser.write(packet)
 
-def ART():
+#def ART():
 
 
 def update_hp_rd(HP, RD):
@@ -145,7 +145,7 @@ def update_hp_rd(HP, RD):
         #send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
     if flag_art and art_up >= 60:
         art_values = [art1, art2, art3, art4, art5]
-        art_addresses = [0x7000, 0x7001, 0x7002, 0x7003, 0x7004]
+        art_addresses = [0x7010, 0x7011, 0x7012, 0x7013, 0x7014]
 
         for i in range(5):
             if art_values[i] > 0:
@@ -586,6 +586,8 @@ def main():
             int_write(0x5315, Seva)
             int_write(0x5314, Stalker)
             int_write(0x5317, Ecologist)
+
+            #int_write(0x7000, art1)
 
             int_write(0x5321, int(arm_rad * 10))
             int_write(0x5320, int(regen * 10))
