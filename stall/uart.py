@@ -1,7 +1,6 @@
 import serial
 import time
 import subprocess
-from stall.stall import B190, Anabiotic, Drink, Ip2, Psy_block
 import uart
 
 serial_port = "/dev/ttyS5"
