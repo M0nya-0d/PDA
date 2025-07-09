@@ -25,12 +25,28 @@ bint = 0
 apteka20 = 0
 apteka30 = 0
 apteka50 = 0
+Drink = 0
+B190 = 0
+Psy_block = 0
+Ip2 = 0
+Anabiotic = 0
 Jacket = 0
 Merc = 0
 Exoskeleton = 0
 Seva = 0
 Stalker = 0
 Ecologist = 0
+
+block_time = 0
+
+oasis = False
+norma = True
+flag_radic = False
+flag_anomaly = False
+block_psy = False
+block_rad = False
+block_anom = False
+
 params = {}
 
 uart.HP = HP
@@ -39,25 +55,36 @@ uart.arm_psy = arm_psy
 uart.arm_rad = arm_rad
 uart.arm_anom = arm_anom
 uart.regen = regen
+
 uart.antirad = antirad
 uart.vodka = vodka
+uart.Anabiotic = Anabiotic
+
 uart.bint = bint
 uart.apteka20 = apteka20
 uart.apteka30 = apteka30
 uart.apteka50 = apteka50
+
+uart.Drink = Drink
+uart.B190 = B190
+uart.Psy_block = Psy_block
+uart.Ip2 = Ip2
+
 uart.Jacket = Jacket
 uart.Merc = Merc
 uart.Exoskeleton = Exoskeleton
 uart.Seva = Seva
 uart.Stalker = Stalker
 uart.Ecologist = Ecologist
+
+uart.block_time = block_time
+uart.block_psy = block_psy
+uart.block_rad = block_rad
+uart.block_anom = block_anom
+
 uart.current_nik = current_nik
 uart.params = params
 
-oasis = False
-norma = True
-flag_radic = False
-flag_anomaly = False
 
 jdy_port = "/dev/ttyS1"
 jdy_baud = 9600
@@ -94,7 +121,7 @@ def send_text(addr, text):
         ser.write(packet)
 
 def update_hp_rd(HP, RD):
-    global rd_up, hp_up, oasis, norma, flag_radic, flag_anomaly, radic_up, oasis_up, anomaly_up, arm_psy, arm_anom, arm_rad, regen, regen_up
+    global rd_up, hp_up, oasis, norma, flag_radic, flag_anomaly, radic_up, oasis_up, anomaly_up, arm_psy, arm_anom, arm_rad, regen, regen_up, block_time, block_psy, block_rad, block_anom
     rd_up += 1
     hp_up += 1
     orig_HP, orig_RD = HP, RD
@@ -103,6 +130,13 @@ def update_hp_rd(HP, RD):
     #    norma = False
     #   HP = 0
         #send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
+    if block_time > 0:
+        block_time -= 1
+        if block_time == 0:
+            block_anom = False
+            block_psy = False
+            block_rad = False
+            int_write(0x6100, 0) ## Номер иконки    
     if not flag_anomaly and not flag_radic:
         if regen > 0:
             regen_up += 1
@@ -203,17 +237,18 @@ def update_hp_rd(HP, RD):
     return HP, RD, changed, send_packets
 
 def radic():
-    global RD, HP, flag_radic, arm_rad
-    flag_radic = True
-    if arm_rad > 0:
-        rd_change = 100 * (1 - arm_rad / 100)
-        hp_change = 50 * (1 - arm_rad / 100)
-        RD += round(rd_change)
-        HP -= round(hp_change)
-        arm_rad = max(0, round(arm_rad - 0.1, 1))
-    else:
-        RD += 100
-        HP -= 50
+    global RD, HP, flag_radic, arm_rad, block_rad
+    if not block_rad:
+        flag_radic = True
+        if arm_rad > 0:
+            rd_change = 100 * (1 - arm_rad / 100)
+            hp_change = 50 * (1 - arm_rad / 100)
+            RD += round(rd_change)
+            HP -= round(hp_change)
+            arm_rad = max(0, round(arm_rad - 0.1, 1))
+        else:
+            RD += 100
+            HP -= 50
 
 
 def resp():
@@ -222,17 +257,19 @@ def resp():
     oasis = True
 
 def anomaly():
-    global RD, HP, flag_anomaly, arm_anom
-    flag_anomaly = True
-    if arm_anom > 0:
-        rd_change = 100 * (1 - arm_anom / 100)
-        hp_change = 80 * (1 - arm_anom / 100)
-        RD += round(rd_change)
-        HP -= round(hp_change)
-        arm_anom = max(0, round(arm_anom - 0.1, 1))
-    else:
-        RD += 150
-        HP -= 80
+    global RD, HP, flag_anomaly, arm_anom, block_anom
+    if not block_anom:
+        flag_anomaly = True
+        if arm_anom > 0:
+            rd_change = 100 * (1 - arm_anom / 100)
+            hp_change = 80 * (1 - arm_anom / 100)
+            RD += round(rd_change)
+            HP -= round(hp_change)
+            arm_anom = max(0, round(arm_anom - 0.1, 1))
+        else:
+            RD += 150
+            HP -= 80
+
 def psy():
     print("PSY")
 
@@ -248,7 +285,7 @@ def save_params(filename, data):
         json.dump(data, f, indent=4)
 
 def main():
-    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, number_pda, current_nik, arm_anom, arm_psy, arm_rad, regen, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist
+    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, number_pda, current_nik, arm_anom, arm_psy, arm_rad, regen, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, B190, Drink, Psy_block, Ip2, Anabiotic, block_time, block_psy, block_rad, block_anom
     all_params = load_params("/home/orangepi/PDA/stall/param.json")
     ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=0.01)
 
@@ -301,12 +338,30 @@ def main():
     arm_rad = params["Radic"]
     arm_anom = params["Anomaly"]
     regen = params["Regen"]
+
+    for med in params.get("Medicina", []):
+        if med["name"] == "B190":
+            B190 = med["count"]
+    for med in params.get("Medicina", []):
+        if med["name"] == "Drink":
+            Drink = med["count"]
+    for med in params.get("Medicina", []):
+        if med["name"] == "Psy_block":
+            Psy_block = med["count"]
+    for med in params.get("Medicina", []):
+        if med["name"] == "Ip2":
+            Ip2 = med["count"]
+
     for med in params.get("Medicina", []):
         if med["name"] == "Antirad":
             antirad = med["count"]
     for med in params.get("Medicina", []):
         if med["name"] == "Vodka":
             vodka = med["count"]
+    for med in params.get("Medicina", []):
+        if med["name"] == "Anabiotic":
+            Anabiotic = med["count"]
+
     for med in params.get("Medicina", []):
         if med["name"] == "Bint":
             bint = med["count"]
@@ -319,6 +374,7 @@ def main():
     for med in params.get("Medicina", []):
         if med["name"] == "Apteka50":
             apteka50 = med["count"]
+
     for med in params.get("Medicina", []):
         if med["name"] == "Jacket":
             Jacket = med["count"]
@@ -344,12 +400,21 @@ def main():
     uart.arm_rad = arm_rad
     uart.arm_anom = arm_anom
     uart.regen = regen
+
+    uart.B190 = B190
+    uart.Drink = Drink
+    uart.Ip2 = Ip2
+    uart.Psy_block = Psy_block
+
     uart.antirad = antirad
     uart.vodka = vodka
+    uart.Anabiotic = Anabiotic
+
     uart.bint = bint
     uart.apteka20 = apteka20
     uart.apteka30 = apteka30
     uart.apteka50 = apteka50
+
     uart.Jacket = Jacket
     uart.Merc = Merc
     uart.Seva = Seva
@@ -387,6 +452,15 @@ def main():
                             Seva = uart.Seva
                             Stalker = uart.Stalker
                             Ecologist = uart.Ecologist
+                            Anabiotic = uart.Anabiotic
+                            B190 = uart.B190
+                            Drink = uart.Drink
+                            Ip2 = uart.Ip2
+                            Psy_block = uart.Psy_block
+                            block_time = uart.block_time
+                            block_psy = uart.block_psy
+                            block_rad = uart.block_rad
+                            block_anom = uart.block_anom
                             params = uart.params
                             buffer = bytearray()
             elif s == jdy_ser:
@@ -415,10 +489,23 @@ def main():
             params["Anomaly"] = arm_anom
             params["Regen"] = regen
             for med in params.get("Medicina", []): # записал в файл
+                
                 if med["name"] == "Antirad":
                     med["count"] = antirad
                 elif med["name"] == "Vodka":
                     med["count"] = vodka
+                elif med["name"] == "Anabiotic":
+                    med["count"] = Anabiotic
+
+                elif med["name"] == "B190":
+                    med["count"] = B190
+                elif med["name"] == "Drink":
+                    med["count"] = Drink
+                elif med["name"] == "Ip2":
+                    med["count"] = Ip2
+                elif med["name"] == "Psy_block":
+                    med["count"] = Psy_block    
+
                 elif med["name"] == "Bint":
                     med["count"] = bint
                 elif med["name"] == "Apteka20":
@@ -427,6 +514,7 @@ def main():
                     med["count"] = apteka30
                 elif med["name"] == "Apteka50":
                     med["count"] = apteka50
+
                 elif med["name"] == "Jacket":
                     med["count"] = Jacket
                 elif med ["name"] == "Merc":
@@ -446,16 +534,25 @@ def main():
             int_write(0x5001, RD)
             int_write(0x5301, antirad)
             int_write(0x5302, vodka)
+            int_write(0x5303, Anabiotic)
+
+            int_write(0x5304, B190)
+            int_write(0x5307, Drink)
+            int_write(0x5306, Ip2)
+            int_write(0x5305, Psy_block)
+
             int_write(0x5308, bint)
             int_write(0x5309, apteka20)
             int_write(0x5310, apteka30)
             int_write(0x5311, apteka50)
+
             int_write(0x5312, Jacket)
             int_write(0x5313, Merc)
             int_write(0x5316, Exoskeleton)
             int_write(0x5315, Seva)
             int_write(0x5314, Stalker)
             int_write(0x5317, Ecologist)
+
             int_write(0x5321, int(arm_rad * 10))
             int_write(0x5320, int(regen * 10))
             int_write(0x5323, int(arm_psy * 10))
@@ -485,10 +582,18 @@ def main():
                 known_meds = {  
                     "Antirad": antirad,
                     "Vodka": vodka,
+                    "Anabiotic": Anabiotic,
+
+                    "B190": B190,
+                    "Drink": Drink,
+                    "Ip2": Ip2,
+                    "Psy_block": Psy_block,
+                    
                     "Bint": bint,
                     "Apteka20": apteka20,
                     "Apteka30": apteka30,
                     "Apteka50": apteka50,
+
                     "Jacket": Jacket,
                     "Merc": Merc,
                     "Exoskeleton": Exoskeleton,
