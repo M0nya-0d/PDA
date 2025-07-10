@@ -307,7 +307,11 @@ def anomaly():
 def psy():
     print("PSY")
 
-
+def KDA():
+    global number_pda
+    message = f"KDA {number_pda} POISK"
+    print(f"[KDA] 📡 {message}")
+    jdy_ser.write((message + "\n").encode("utf-8"))
 
 def load_params(filename):
     with open(filename, "r") as f:
@@ -458,6 +462,7 @@ def main():
     uart.current_nik = current_nik
     uart.send_text = send_text
     uart.params = params
+    uart.KDA = KDA
 
     buffer = bytearray()
     tcount = 0
@@ -477,8 +482,8 @@ def main():
                         plen = buffer[2]
                         if len(buffer) >= plen + 3:
                             packet = buffer[:plen + 3]
-                            #uart.process_packet(packet, send_text, int_write)
-                            HP, RD, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, arm_rad, arm_psy, arm_anom, regen, B190, Drink, Ip2, Psy_block, Anabiotic, block_rad, block_anom, block_psy, block_time = uart.process_packet(packet, send_text, int_write)
+                            #uart.process_packet(packet, send_text, int_write, KDA)
+                            HP, RD, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, arm_rad, arm_psy, arm_anom, regen, B190, Drink, Ip2, Psy_block, Anabiotic, block_rad, block_anom, block_psy, block_time = uart.process_packet(packet, send_text, int_write, KDA)
                             antirad, vodka = uart.antirad, uart.vodka
                             bint = uart.bint
                             apteka20, apteka30, apteka50 = uart.apteka20, uart.apteka30, uart.apteka50

@@ -6,7 +6,7 @@ import uart
 serial_port = "/dev/ttyS5"
 baud_rate = 115200
 
-def process_packet(packet, send_text, int_write):
+def process_packet(packet, send_text, int_write, KDA):
     global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, current_nik, number_pda, arm_rad, arm_psy, arm_anom, regen, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, B190, Drink, Ip2, Psy_block, Anabiotic, block_rad, block_anom, block_psy, block_time
     default_return = (HP, RD, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, arm_rad, arm_psy, arm_anom, regen)
     if not (packet[0] == 0x5A and packet[1] == 0xA5):
@@ -20,11 +20,12 @@ def process_packet(packet, send_text, int_write):
     vp = (packet[4] << 8) | packet[5]
     value = packet[8]
 
-    # === Jacket (arm_rad += 10) ===
-    #if vp == 0x5651 and value == 1:
-    #    print("🛡️ Используем Jacket — добавляем защиту от радиации")
-    #    arm_rad += 10
-    #    return
+    if vp == 0x7777 and value == 1:
+        try:
+            KDA()  # вызываем вашу функцию
+            print("🚀 Функция KDA запущена")
+        except Exception as e:
+            print(f"❌ Ошибка при запуске KDA: {e}")
 
     # === Медикаменты ===
     med_actions = {
@@ -236,6 +237,8 @@ def process_packet(packet, send_text, int_write):
                 uart.arm_anom = arm_anom
                 uart.arm_psy = arm_psy
                 uart.regen = regen
+
+    
 
         else:
             print(f"Нет {name} в запасе!")
