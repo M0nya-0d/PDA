@@ -310,7 +310,8 @@ def psy():
 
 def KDA():
     global jdy_ser, number_pda
-    message = f"KDA {uart.number_pda} POISK"
+    message = 44
+    #message = f"KDA {uart.number_pda} POISK"
     print(f"[KDA] 📡 {message}")
     jdy_send_queue.put(message)  # Добавляем в очередь, а не отправляем сразу
     #if jdy_ser.is_open:
