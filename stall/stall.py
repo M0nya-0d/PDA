@@ -309,17 +309,14 @@ def psy():
     print("PSY")
 
 def KDA():
-    global jdy_ser, number_pda
-    message = 44
-    #message = f"KDA {uart.number_pda} POISK"
+    global number_pda, jdy_ser
+    message = f"KDA {number_pda} POISK"
     print(f"[KDA] 📡 {message}")
-    jdy_send_queue.put(message)  # Добавляем в очередь, а не отправляем сразу
-    #if jdy_ser.is_open:
-    #    print("[KDA] Байты:", (message + "\n").encode("utf-8"))
-    #    jdy_ser.write((message + "\n").encode("utf-8"))
-    #    jdy_ser.flush()
-    #else:
-    #    print("[KDA] ❌ jdy_ser не открыт!")
+    try:
+        jdy_ser.write((message + "\n").encode("utf-8"))
+        print(f"[KDA] ⬅️ отправка: {message}")
+    except Exception as e:
+        print(f"[KDA] ⚠️ Ошибка отправки: {e}")
 
 def load_params(filename):
     with open(filename, "r") as f:
