@@ -308,10 +308,12 @@ def psy():
     print("PSY")
 
 def KDA():
-    global number_pda
-    message = f"KDA {number_pda} POISK"
+    message = f"KDA {uart.number_pda} POISK"
     print(f"[KDA] 📡 {message}")
-    jdy_ser.write((message + "\n").encode("utf-8"))
+    if uart.jdy_ser.is_open:
+        uart.jdy_ser.write((message + "\n").encode("utf-8"))
+    else:
+        print("[KDA] ❌ jdy_ser не открыт!")
 
 def load_params(filename):
     with open(filename, "r") as f:
@@ -463,6 +465,7 @@ def main():
     uart.send_text = send_text
     uart.params = params
     uart.KDA = KDA
+    uart.jdy_ser = jdy_ser
 
     buffer = bytearray()
     tcount = 0
