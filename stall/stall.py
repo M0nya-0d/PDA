@@ -3,8 +3,9 @@ import time
 import json
 import uart
 import select
+from queue import Queue
 
-
+jdy_send_queue = Queue()
 current_nik = "gggg"
 number_pda = 0
 HP = 0
@@ -308,12 +309,16 @@ def psy():
     print("PSY")
 
 def KDA():
+    global jdy_ser, number_pda
     message = f"KDA {uart.number_pda} POISK"
     print(f"[KDA] 📡 {message}")
-    if uart.jdy_ser.is_open:
-        uart.jdy_ser.write((message + "\n").encode("utf-8"))
-    else:
-        print("[KDA] ❌ jdy_ser не открыт!")
+    jdy_send_queue.put(message)  # Добавляем в очередь, а не отправляем сразу
+    #if jdy_ser.is_open:
+    #    print("[KDA] Байты:", (message + "\n").encode("utf-8"))
+    #    jdy_ser.write((message + "\n").encode("utf-8"))
+    #    jdy_ser.flush()
+    #else:
+    #    print("[KDA] ❌ jdy_ser не открыт!")
 
 def load_params(filename):
     with open(filename, "r") as f:
@@ -475,7 +480,18 @@ def main():
     need_save = False
 
     while True:
-        rlist, _, _ = select.select([ser, jdy_ser], [], [], 0.01)
+        if not jdy_send_queue.empty():
+            msg = jdy_send_queue.get()
+            try:
+                if jdy_ser.is_open:
+                    print(f"[KDA] ⬅️ отправка: {msg}")
+                    jdy_ser.write((msg + "\n").encode("utf-8"))
+                    jdy_ser.flush()
+                else:
+                    print("[KDA] ❌ Порт закрыт")
+            except Exception as e:
+                print("[KDA] ⚠️ Ошибка отправки:", e)
+        rlist, _, _ = select.select([ser, jdy_ser], [], [], 0.01)        
         for s in rlist:
             if s == ser:
                 data = ser.read(1)
