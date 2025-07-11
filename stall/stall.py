@@ -97,7 +97,7 @@ uart.params = params
 
 jdy_port = "/dev/ttyUSB0"
 jdy_baud = 9600
-jdy_ser = serial.Serial(jdy_port, baudrate=jdy_baud, timeout=0.3)
+jdy_ser = serial.Serial(jdy_port, baudrate=jdy_baud, timeout=0.1)
 serial_port = "/dev/ttyS5"
 baud_rate = 115200
 VERS_PATH = "/home/orangepi/PDA/vers.txt"
@@ -328,7 +328,7 @@ def save_params(filename, data):
         json.dump(data, f, indent=4)
 
 def main():
-    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, number_pda, current_nik, arm_anom, arm_psy, arm_rad, regen, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, B190, Drink, Psy_block, Ip2, Anabiotic, block_time, block_psy, block_rad, block_anom
+    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, number_pda, current_nik, arm_anom, arm_psy, arm_rad, regen, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, B190, Drink, Psy_block, Ip2, Anabiotic, block_time, block_psy, block_rad, block_anom, number_pda
     all_params = load_params("/home/orangepi/PDA/stall/param.json")
     ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=0.01)
 
@@ -478,6 +478,7 @@ def main():
     need_save = False
 
     while True:
+        jdy_buffer = ""
         if not jdy_send_queue.empty():
             msg = jdy_send_queue.get()
             try:
@@ -522,30 +523,31 @@ def main():
             elif s == jdy_ser:
                 jdy_data = jdy_ser.read(jdy_ser.in_waiting or 1)
                 if jdy_data:
-                    decoded = jdy_data.decode(errors='ignore').strip()
-                    print(f"[JDY-40] 📶 Получено: {decoded}")
+                    jdy_buffer += jdy_data.decode(errors='ignore')
+                    while '\n' in jdy_buffer:
+                        line, jdy_buffer = jdy_buffer.split('\n', 1)
+                        line = line.strip()
+                        if line:
+                            print(f"[JDY-40] 📶 Получено: {line}")
 
-                    # Проверка стандартных команд
-                    if decoded == "Radic-1":
-                        radic()  
-                    elif decoded == "Oasis":
-                        resp()
-                    elif decoded == "Anomaly":
-                        anomaly()          
-                    elif decoded == "PSY":
-                        psy()
+                            if line == "Radic-1":
+                                radic()
+                            elif line == "Oasis":
+                                resp()
+                            elif line == "Anomaly":
+                                anomaly()
+                            elif line == "PSY":
+                                psy()
+                            elif line.startswith("PDA"):
+                                parts = line.split()
+                                if len(parts) >= 3:
+                                    prefix, id_str, type_device = parts[0], parts[1], parts[2]
+                                    try:
+                                        if int(id_str) == number_pda:
+                                            print(f"[PDA] ✅ Это для нас. Тип устройства: {type_device}")
+                                    except ValueError:
+                                        print("[PDA] ⚠️ Неверный формат ID")
 
-                    # 🔍 Добавляем проверку PDA
-                    elif decoded.startswith("PDA"):
-                        parts = decoded.split()
-                        if len(parts) >= 3:
-                            prefix, id_str, type_device = parts[0], parts[1], parts[2]
-                            try:
-                                if int(id_str) == namber_pda:  # Проверка ID
-                                    print(f"[PDA] ✅ Это для нас. Тип устройства: {type_device}")
-                                    # Можно вызвать сохранение, реакцию и т.д.
-                            except ValueError:
-                                print("[PDA] ⚠️ Неверный формат ID")
         now = time.monotonic()
         if now - last_update >= 1.0:
             last_update = now
