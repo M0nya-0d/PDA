@@ -310,7 +310,7 @@ def psy():
 
 def KDA():
     global number_pda, jdy_ser
-    message = f"KDA {number_pda} POISK"
+    message = f"KDA{number_pda}POISK"
     print(f"[KDA] 📡 {message}")
     try:
         jdy_ser.write((message + "\n").encode("utf-8"))
@@ -524,14 +524,28 @@ def main():
                 if jdy_data:
                     decoded = jdy_data.decode(errors='ignore').strip()
                     print(f"[JDY-40] 📶 Получено: {decoded}")
+
+                    # Проверка стандартных команд
                     if decoded == "Radic-1":
                         radic()  
-                    if decoded == "Oasis":
+                    elif decoded == "Oasis":
                         resp()
-                    if decoded == "Anomaly":
+                    elif decoded == "Anomaly":
                         anomaly()          
-                    if decoded == "PSY":
+                    elif decoded == "PSY":
                         psy()
+
+                    # 🔍 Добавляем проверку PDA
+                    elif decoded.startswith("PDA"):
+                        parts = decoded.split()
+                        if len(parts) >= 3:
+                            prefix, id_str, type_device = parts[0], parts[1], parts[2]
+                            try:
+                                if int(id_str) == namber_pda:  # Проверка ID
+                                    print(f"[PDA] ✅ Это для нас. Тип устройства: {type_device}")
+                                    # Можно вызвать сохранение, реакцию и т.д.
+                            except ValueError:
+                                print("[PDA] ⚠️ Неверный формат ID")
         now = time.monotonic()
         if now - last_update >= 1.0:
             last_update = now
