@@ -310,7 +310,7 @@ def psy():
 
 def KDA():
     global number_pda, jdy_ser
-    message = f"KDA{number_pda}POISK"
+    message = f"KDA {number_pda} POISK"
     print(f"[KDA] 📡 {message}")
     try:
         jdy_ser.write((message + "\n").encode("utf-8"))
