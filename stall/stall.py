@@ -521,15 +521,11 @@ def main():
                             params = uart.params
                             buffer = bytearray()
             elif s == jdy_ser:
-                jdy_data = jdy_ser.read(jdy_ser.in_waiting or 1)
-                if jdy_data:
-                    jdy_buffer += jdy_data.decode(errors='ignore')
-                    while '\n' in jdy_buffer:
-                        line, jdy_buffer = jdy_buffer.split('\n', 1)
-                        line = line.strip()
+                while jdy_ser.in_waiting:
+                    try:
+                        line = jdy_ser.readline().decode(errors='ignore').strip()
                         if line:
                             print(f"[JDY-40] 📶 Получено: {line}")
-
                             if line == "Radic-1":
                                 radic()
                             elif line == "Oasis":
@@ -547,6 +543,8 @@ def main():
                                             print(f"[PDA] ✅ Это для нас. Тип устройства: {type_device}")
                                     except ValueError:
                                         print("[PDA] ⚠️ Неверный формат ID")
+                    except Exception as e:
+                        print(f"[JDY-40] ⚠️ Ошибка чтения: {e}")
 
         now = time.monotonic()
         if now - last_update >= 1.0:
