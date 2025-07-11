@@ -95,9 +95,9 @@ uart.current_nik = current_nik
 uart.params = params
 
 
-jdy_port = "/dev/ttyS1"
+jdy_port = "/dev/ttyUSB0"
 jdy_baud = 9600
-jdy_ser = serial.Serial(jdy_port, baudrate=jdy_baud, timeout=0.01)
+jdy_ser = serial.Serial(jdy_port, baudrate=jdy_baud, timeout=0.3)
 serial_port = "/dev/ttyS5"
 baud_rate = 115200
 VERS_PATH = "/home/orangepi/PDA/vers.txt"
