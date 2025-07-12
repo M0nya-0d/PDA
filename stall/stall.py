@@ -1,3 +1,4 @@
+from email.iterators import typed_subpart_iterator
 import serial
 import time
 import json
@@ -284,6 +285,26 @@ def radic():
             RD += 100
             HP -= 50
 
+def art_type(device_type):
+    handlers = {
+        "COMPAS": lambda: int_write(0x7005, 3),
+        "BATARY": lambda: int_write(0x7005, 13),
+        "KAPLYA": lambda: int_write(0x7005, 7),
+        "BUBBLE": lambda: int_write(0x7005, 6),
+        "FLAME": lambda: int_write(0x7005, 9),
+        "JOKER": lambda: int_write(0x7005, 15),
+        "GOLD": lambda: int_write(0x7005, 18),
+        "SHADOW": lambda: int_write(0x7005, 11),
+        "STORM": lambda: int_write(0x7005, 17),
+        "CRYSTAL": lambda: int_write(0x7005, 5),
+        
+    }
+
+    if device_type in handlers:
+        print(f"[ART TYPE] 🎯 Обработка типа устройства: {device_type}")
+        handlers[device_type]()
+    else:
+        print(f"[ART TYPE] ❌ Неизвестный тип устройства: {device_type}")
 
 def resp():
     global oasis, oasis_up
@@ -541,6 +562,7 @@ def main():
                                     try:
                                         if int(id_str) == number_pda:
                                             print(f"[PDA] ✅ Это для нас. Тип устройства: {type_device}")
+                                            art_type(type_device)
                                     except ValueError:
                                         print("[PDA] ⚠️ Неверный формат ID")
                     except Exception as e:
