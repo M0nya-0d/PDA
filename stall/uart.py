@@ -47,6 +47,16 @@ def process_packet(packet, send_text, int_write, KDA, art_efeckt):
                 print("⚠️ Нет сохранённого типа артефакта")
         except Exception as e:
             print(f"❌ Ошибка при применении art_efeckt: {e}")
+    
+    elif 0x7023 <= vp <= 0x7027 and value == 1:
+        index = vp - 0x7023  # 0 для art1, 4 для art5
+        drop_command = f"DROP {index + 1}"
+        print(f"🗑️ Удаление артефакта: {drop_command}")
+        try:
+            art_efeckt(drop_command)
+        except Exception as e:
+            print(f"❌ Ошибка при удалении артефакта {drop_command}: {e}")
+
 
     # === Медикаменты ===
     med_actions = {

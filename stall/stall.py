@@ -328,7 +328,6 @@ def art_type(device_type):
 
 
 def art_efeckt(device_type):
-    int_write(0x7005, 31)
     global last_device_number, last_device_type, flag_art 
     global art1, art2, art3, art4, art5
     global art1_name, art2_name, art3_name, art4_name, art5_name
@@ -394,7 +393,8 @@ def art_efeckt(device_type):
     name = device_type.replace(" USE", "")
     if name not in artifacts:
         return
-
+    int_write(0x7005, 31)
+    
     for var_name, name_var, addr in art_slots:
         if globals()[var_name] == 0:
             globals()[var_name] = 4   # минут эффекта
