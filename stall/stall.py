@@ -161,6 +161,7 @@ def update_hp_rd(HP, RD):
             if art_values[i] > 0:
                 art_values[i] -= 1
                 if art_values[i] == 0:
+                    globals()[f"art{i+1}_name"] = art_names[i]
                     art_efeckt(f"DROP {i+1}")
 
         # Возврат значений в глобальные переменные
