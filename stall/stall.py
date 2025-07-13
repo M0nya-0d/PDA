@@ -402,9 +402,12 @@ def art_efeckt(device_type):
             int_write(addr, artifacts[name]["value"])
             artifacts[name]["effect"]()
             int_write(0x6011, 1)
+            print(last_device_type)
+            print(last_device_number)
             if last_device_type and last_device_number:
                 use_command = f"{last_device_type}{last_device_number}use"
                 jdy_send_queue.put(use_command)
+                print(use_command)
             break
 
 def apply_effect(rad=0, psy=0, regen=0, anom=0, rd=0):
