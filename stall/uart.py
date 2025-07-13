@@ -38,15 +38,15 @@ def process_packet(packet, send_text, int_write, KDA, art_efeckt):
     
     if vp == 0x7021 and value == 1:
         print(f"DEBUG: last_device_type = {last_device_type!r}")
-        try:
-            if last_device_type:
-                print(f"✅ Отправляем {last_device_type} в art_efeckt как USE")
-                art_efeckt(f"{last_device_type} USE")
-                last_device_type = None
-            else:
-                print("⚠️ Нет сохранённого типа артефакта")
-        except Exception as e:
-            print(f"❌ Ошибка при применении art_efeckt: {e}")
+#        try:
+#            if last_device_type:
+#                print(f"✅ Отправляем {last_device_type} в art_efeckt как USE")
+#                art_efeckt(f"{last_device_type} USE")
+#                last_device_type = None
+#            else:
+#                print("⚠️ Нет сохранённого типа артефакта")
+#        except Exception as e:
+#            print(f"❌ Ошибка при применении art_efeckt: {e}")
 
     # === Медикаменты ===
     med_actions = {
