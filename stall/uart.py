@@ -21,7 +21,7 @@ def process_packet(packet, send_text, int_write, KDA, art_efeckt):
     vp = (packet[4] << 8) | packet[5]
     value = packet[8]
 
-    if vp == 0x7777 and value == 1:
+    if vp == 0x7778 and value == 1:
         try:
             KDA()  # вызываем вашу функцию
             print("🚀 Функция KDA запущена")
@@ -37,6 +37,7 @@ def process_packet(packet, send_text, int_write, KDA, art_efeckt):
             print(f"Ошибка работы с контейнером {e}")        
     
     if vp == 0x7021 and value == 1:
+        print(f"DEBUG: last_device_type = {last_device_type!r}")
         try:
             if last_device_type:
                 print(f"✅ Отправляем {last_device_type} в art_efeckt как USE")
