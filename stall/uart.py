@@ -2,7 +2,7 @@ import serial
 import time
 import subprocess
 import uart
-from stall import art_efeckt
+#from stall import art_efeckt
 
 serial_port = "/dev/ttyS5"
 baud_rate = 115200
@@ -41,6 +41,7 @@ def process_packet(packet, send_text, int_write, KDA, art_efeckt):
             if last_device_type:
                 print(f"✅ Отправляем {last_device_type} в art_efeckt как USE")
                 art_efeckt(f"{last_device_type} USE")
+                last_device_type = None
             else:
                 print("⚠️ Нет сохранённого типа артефакта")
         except Exception as e:
