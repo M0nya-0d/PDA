@@ -139,14 +139,14 @@ def send_text(addr, text):
 
 
 def update_hp_rd(HP, RD):
-    global rd_up, hp_up, oasis, norma, flag_radic, flag_anomaly, radic_up, oasis_up, anomaly_up, arm_psy, arm_anom, arm_rad, regen, regen_up, block_time, block_psy, block_rad, block_anom, art1, art2, art3, art4, art5, art_up, flag_art, art1_name, art2_name, art3_name, art4_name, art5_name, rad_stat, anom_stat, regen_stat, psy_stat
+    global rd_up, hp_up, oasis, norma, flag_radic, flag_anomaly, radic_up, oasis_up, anomaly_up, arm_psy, arm_anom, arm_rad, regen, regen_up, block_time, block_psy, block_rad, block_anom, art1, art2, art3, art4, art5, art_up, flag_art, art1_name, art2_name, art3_name, art4_name, art5_name, rad_stat, anom_stat, regen_stat, psy_stat, RD_stat
     rd_up += 1
     hp_up += 1
     if flag_art:
         art_up += 1
     orig_HP, orig_RD = HP, RD
-    #if rad_stat > 0:
-    #    RD += rad_stat 
+    if RD_stat > 0:
+        RD = RD + RD_stat
     send_packets = []  # Список байтовых команд, которые нужно отправить
     #if HP <= 0:
     #    norma = False
@@ -785,10 +785,10 @@ def main():
             int_write(0x7013, art4)
             int_write(0x7014, art5)
 
-            int_write(0x5321, int(arm_rad * 10))
-            int_write(0x5320, int(regen * 10))
-            int_write(0x5323, int(arm_psy * 10))
-            int_write(0x5322, int(arm_anom * 10))
+            int_write(0x5321, int(arm_rad * 10) + rad_stat)
+            int_write(0x5320, int(regen * 10) + regen_stat)
+            int_write(0x5323, int(arm_psy * 10) + psy_stat)
+            int_write(0x5322, int(arm_anom * 10) + anom_stat)
             
             int_write(0x5999, int_version)
 
