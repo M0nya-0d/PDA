@@ -403,8 +403,8 @@ def art_efeckt(device_type):
             artifacts[name]["effect"]()
             int_write(0x6011, 1)
             if last_device_type and last_device_number:
-            use_command = f"{last_device_type}{last_device_number}use"
-            jdy_send_queue.put(use_command)
+                use_command = f"{last_device_type}{last_device_number}use"
+                jdy_ser.write((use_command + "\n").encode("utf-8"))
             break
 
 def apply_effect(rad=0, psy=0, regen=0, anom=0, rd=0):
