@@ -349,8 +349,8 @@ def art_efeckt(device_type):
         # (3, 1000, 0, 0), (+1000 rad, +1000 regen, 0 psy, 0 anom, +3 RD)
         "COMPAS": {
             "value": 3,
-            "effect": lambda: apply_effect(1000, 1000, 0, 0, 3), # далает  +
-            "remove": lambda: apply_effect(-1000, -1000, 0, 0, -3), # далает -
+            "effect": lambda: apply_effect(100, 100, 50, 30, 2), # далает  +
+            "remove": lambda: apply_effect(-100, -100, 50, 30, -2), # далает -
         },
         "BATARY": {
             "value": 4,
