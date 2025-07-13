@@ -51,6 +51,7 @@ rad_stat = 0
 regen_stat = 0
 anom_stat = 0
 psy_stat = 0
+RD_stat = 0
 
 oasis = False
 norma = True
@@ -138,12 +139,14 @@ def send_text(addr, text):
 
 
 def update_hp_rd(HP, RD):
-    global rd_up, hp_up, oasis, norma, flag_radic, flag_anomaly, radic_up, oasis_up, anomaly_up, arm_psy, arm_anom, arm_rad, regen, regen_up, block_time, block_psy, block_rad, block_anom, art1, art2, art3, art4, art5, art_up, flag_art, art1_name, art2_name, art3_name, art4_name, art5_name
+    global rd_up, hp_up, oasis, norma, flag_radic, flag_anomaly, radic_up, oasis_up, anomaly_up, arm_psy, arm_anom, arm_rad, regen, regen_up, block_time, block_psy, block_rad, block_anom, art1, art2, art3, art4, art5, art_up, flag_art, art1_name, art2_name, art3_name, art4_name, art5_name, rad_stat, anom_stat, regen_stat, psy_stat
     rd_up += 1
     hp_up += 1
     if flag_art:
         art_up += 1
     orig_HP, orig_RD = HP, RD
+    #if rad_stat > 0:
+    #    RD += rad_stat 
     send_packets = []  # Список байтовых команд, которые нужно отправить
     #if HP <= 0:
     #    norma = False
@@ -295,14 +298,16 @@ def update_hp_rd(HP, RD):
     return HP, RD, changed, send_packets
 
 def radic():
-    global RD, HP, flag_radic, arm_rad, block_rad
+    global RD, HP, flag_radic, arm_rad, block_rad, rad_stat, RD_stat
     if not block_rad:
         flag_radic = True
+        arm_rad = min(100, arm_rad + RD_stat)
         if arm_rad > 0:
             rd_change = 100 * (1 - arm_rad / 100)
             hp_change = 50 * (1 - arm_rad / 100)
             RD += round(rd_change)
             HP -= round(hp_change)
+            arm_rad = max(0, arm_rad - RD_stat)
             arm_rad = max(0, round(arm_rad - 0.1, 1))
             uart.arm_rad = arm_rad
         else:
@@ -327,7 +332,7 @@ def art_type(device_type):
     }
 
     if device_type in handlers:
-        print(f"[ART TYPE] 🎯 Обработка типа устройства: {device_type}")
+        #print(f"[ART TYPE] 🎯 Обработка типа устройства: {device_type}")
         handlers[device_type]()
     else:
         print(f"[ART TYPE] ❌ Неизвестный тип устройства: {device_type}")
@@ -337,34 +342,35 @@ def art_type(device_type):
 def art_efeckt(device_type):
     global art1, art2, art3, art4, art5
     global art1_name, art2_name, art3_name, art4_name, art5_name
-    global rad_stat, regen_stat, psy_stat, anom_stat
+    global rad_stat, regen_stat, psy_stat, anom_stat, RD_stat
 
     # Название артефакта -> номер картинки, эффект и удаление эффекта
     artifacts = {
+        # (3, 1000, 0, 0), (+1000 rad, +1000 regen, 0 psy, 0 anom, +3 RD)
         "COMPAS": {
             "value": 3,
-            "effect": lambda: apply_effect(3, 1000, 0, 0),
-            "remove": lambda: apply_effect(-3, -1000, 0, 0),
+            "effect": lambda: apply_effect(1000, 1000, 0, 0, 3), # далает  +
+            "remove": lambda: apply_effect(-1000, -1000, 0, 0, -3), # далает -
         },
         "BATARY": {
             "value": 4,
-            "effect": lambda: apply_effect(0, 0, 1, 500),
-            "remove": lambda: apply_effect(0, 0, -1, -500),
+            "effect": lambda: apply_effect(800, 0, 1, 500, 4),
+            "remove": lambda: apply_effect(-880, 0, -1, -500, -4),
         },
         "KAPLYA": {
             "value": 5,
-            "effect": lambda: apply_effect(0, 500, 0, 1000),
-            "remove": lambda: apply_effect(0, -500, 0, -1000),
+            "effect": lambda: apply_effect(0, 500, 0, 1000, 3),
+            "remove": lambda: apply_effect(0, -500, 0, -1000, -3),
         },
         "FLAME": {
             "value": 6,
-            "effect": lambda: apply_effect(4, 1500, 0, 0),
-            "remove": lambda: apply_effect(-4, -1500, 0, 0),
+            "effect": lambda: apply_effect(4, 1500, 0, 0, 3),
+            "remove": lambda: apply_effect(-4, -1500, 0, 0, -3),
         },
         "JOKER": {
             "value": 7,
-            "effect": lambda: apply_effect(0, 0, 5, 2000),
-            "remove": lambda: apply_effect(0, 0, -5, -2000),
+            "effect": lambda: apply_effect(0, 0, 5, 2000, 3),
+            "remove": lambda: apply_effect(0, 0, -5, -2000, -3),
         },
     }
 
@@ -407,12 +413,13 @@ def art_efeckt(device_type):
             artifacts[name]["effect"]()
             break
 
-def apply_effect(rad=0, psy=0, regen=0, anom=0):
-    global rad_stat, psy_stat, regen_stat, anom_stat
+def apply_effect(rad=0, psy=0, regen=0, anom=0, rd=0):
+    global rad_stat, psy_stat, regen_stat, anom_stat, RD_stat
     rad_stat += rad
     psy_stat += psy
     regen_stat += regen
     anom_stat += anom
+    RD_stat += rd
 
          
 
@@ -422,7 +429,7 @@ def resp():
     oasis = True
 
 def anomaly():
-    global RD, HP, flag_anomaly, arm_anom, block_anom
+    global RD, HP, flag_anomaly, arm_anom, block_anom, anom_stat
     if not block_anom:
         flag_anomaly = True
         if arm_anom > 0:
@@ -679,7 +686,7 @@ def main():
                                         last_device_type = type_device
                                         art_type(type_device)
                                         uart.last_device_type = last_device_type
-                                        print(f"JDY: last_device_type = {last_device_type!r}")
+                                        #print(f"JDY: last_device_type = {last_device_type!r}")
                                     else:
                                         print(f"[JDY] ⚠️ Неизвестный тип артефакта: {type_device}") 
                             elif line.startswith("PDA"):
