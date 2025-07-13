@@ -45,6 +45,7 @@ block_time = 0
 art1 = art2 = art3 = art4 = art5 = 0
 art1_name = art2_name = art3_name = art4_name = art5_name = ""
 last_device_type = None
+last_device_number = None
 art_up = 0
 flag_art = True
 rad_stat = 0
@@ -327,6 +328,8 @@ def art_type(device_type):
 
 
 def art_efeckt(device_type):
+    int_write(0x7005, 31)
+    global last_device_number, last_device_type
     global art1, art2, art3, art4, art5
     global art1_name, art2_name, art3_name, art4_name, art5_name
     global rad_stat, regen_stat, psy_stat, anom_stat, RD_stat
@@ -399,6 +402,9 @@ def art_efeckt(device_type):
             int_write(addr, artifacts[name]["value"])
             artifacts[name]["effect"]()
             int_write(0x6011, 1)
+            if last_device_type and last_device_number:
+            use_command = f"{last_device_type}{last_device_number}use"
+            jdy_send_queue.put(use_command)
             break
 
 def apply_effect(rad=0, psy=0, regen=0, anom=0, rd=0):
@@ -672,9 +678,10 @@ def main():
                                     if type_device in valid_artifacts:
                                         print(f"[JDY] 🔍 Найден артефакт: {type_device} с номером {device_number}")
                                         last_device_type = type_device
+                                        last_device_number = device_number
                                         art_type(type_device)
                                         uart.last_device_type = last_device_type
-                                        #print(f"JDY: last_device_type = {last_device_type!r}")
+                                        
                                     else:
                                         print(f"[JDY] ⚠️ Неизвестный тип артефакта: {type_device}") 
                             elif line.startswith("PDA"):
