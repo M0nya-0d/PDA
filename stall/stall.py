@@ -238,14 +238,14 @@ def update_hp_rd(HP, RD):
             if rd_up >= 3:
                 RD -= 1
                 rd_up = 0
-            #if hp_up >= 2:
-            #    HP -= 1
-            #    hp_up = 0
-            #    if HP <= 0:
-            #        norma = False
-            #        HP = 0
-            #        RD = 0 
-            #        send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x0A]))   
+            if hp_up >= 4:
+                HP -= 1
+                hp_up = 0
+                if HP <= 0:
+                    norma = False
+                    HP = 0
+                    RD = 0 
+                    send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x0A]))   
         elif RD > 4000 and RD <= 7000:
             if rd_up >= 2:
                 RD -= 1
@@ -392,7 +392,7 @@ def art_efeckt(device_type):
 
     for var_name, name_var, addr in art_slots:
         if globals()[var_name] == 0:
-            globals()[var_name] = 240
+            globals()[var_name] = 4   # минут эффекта
             globals()[name_var] = name
             int_write(addr, artifacts[name]["value"])
             artifacts[name]["effect"]()
