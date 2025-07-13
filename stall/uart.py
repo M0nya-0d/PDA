@@ -2,11 +2,12 @@ import serial
 import time
 import subprocess
 import uart
+from stall import art_efeckt
 
 serial_port = "/dev/ttyS5"
 baud_rate = 115200
 
-def process_packet(packet, send_text, int_write, KDA):
+def process_packet(packet, send_text, int_write, KDA, art_efeckt):
     global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, current_nik, number_pda, arm_rad, arm_psy, arm_anom, regen, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, B190, Drink, Ip2, Psy_block, Anabiotic, block_rad, block_anom, block_psy, block_time, last_device_type
     default_return = (HP, RD, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, arm_rad, arm_psy, arm_anom, regen)
     if not (packet[0] == 0x5A and packet[1] == 0xA5):

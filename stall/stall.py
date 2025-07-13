@@ -634,7 +634,7 @@ def main():
                         if len(buffer) >= plen + 3:
                             packet = buffer[:plen + 3]
                             #uart.process_packet(packet, send_text, int_write, KDA)
-                            HP, RD, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, arm_rad, arm_psy, arm_anom, regen, B190, Drink, Ip2, Psy_block, Anabiotic, block_rad, block_anom, block_psy, block_time, last_device_type = uart.process_packet(packet, send_text, int_write, KDA)
+                            HP, RD, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, arm_rad, arm_psy, arm_anom, regen, B190, Drink, Ip2, Psy_block, Anabiotic, block_rad, block_anom, block_psy, block_time, last_device_type = uart.process_packet(packet, send_text, int_write, KDA, art_efeckt)
                             antirad, vodka = uart.antirad, uart.vodka
                             bint = uart.bint
                             apteka20, apteka30, apteka50 = uart.apteka20, uart.apteka30, uart.apteka50
