@@ -95,6 +95,7 @@ uart.block_psy = block_psy
 uart.block_rad = block_rad
 uart.block_anom = block_anom
 
+uart.last_device_type = last_device_type
 uart.current_nik = current_nik
 uart.params = params
 
@@ -599,6 +600,7 @@ def main():
     uart.params = params
     uart.KDA = KDA
     uart.jdy_ser = jdy_ser
+    
 
     buffer = bytearray()
     tcount = 0

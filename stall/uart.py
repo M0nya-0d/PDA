@@ -11,11 +11,11 @@ def process_packet(packet, send_text, int_write, KDA):
     default_return = (HP, RD, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, arm_rad, arm_psy, arm_anom, regen)
     if not (packet[0] == 0x5A and packet[1] == 0xA5):
         print("Пакет не DWIN или нераспознан")
-        return HP, RD, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, arm_rad, arm_psy, arm_anom, regen, B190, Drink, Ip2, Psy_block, Anabiotic, block_rad, block_anom, block_psy, block_time
+        return HP, RD, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, arm_rad, arm_psy, arm_anom, regen, B190, Drink, Ip2, Psy_block, Anabiotic, block_rad, block_anom, block_psy, block_time, last_device_type
 
     if len(packet) < 9 or packet[3] != 0x83:
         print("Пакет нераспознан или слишком короткий:", packet.hex())
-        return HP, RD, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, arm_rad, arm_psy, arm_anom, regen, B190, Drink, Ip2, Psy_block, Anabiotic, block_rad, block_anom, block_psy, block_time
+        return HP, RD, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, arm_rad, arm_psy, arm_anom, regen, B190, Drink, Ip2, Psy_block, Anabiotic, block_rad, block_anom, block_psy, block_time, last_device_type
 
     vp = (packet[4] << 8) | packet[5]
     value = packet[8]
@@ -27,7 +27,7 @@ def process_packet(packet, send_text, int_write, KDA):
         except Exception as e:
             print(f"❌ Ошибка при запуске KDA: {e}")
 
-    if vp == 0x7021 and value == 1:
+    if vp == 0x7022 and value == 1:
         try:
             #KDA()  # вызываем вашу функцию
             print("Ложим в контейнер")
@@ -35,7 +35,7 @@ def process_packet(packet, send_text, int_write, KDA):
         except Exception as e:
             print(f"Ошибка работы с контейнером {e}")        
     
-    if vp == 0x7020 and value == 1:
+    if vp == 0x7021 and value == 1:
         try:
             if last_device_type:
                 print(f"✅ Отправляем {last_device_type} в art_efeckt как USE")
@@ -294,4 +294,4 @@ def process_packet(packet, send_text, int_write, KDA):
 
     else:
         print(f"VP 0x{vp:04X}: значение {value}")
-    return HP, RD, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, arm_rad, arm_psy, arm_anom, regen, B190, Drink, Ip2, Psy_block, Anabiotic, block_rad, block_anom, block_psy, block_time    
+    return HP, RD, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, arm_rad, arm_psy, arm_anom, regen, B190, Drink, Ip2, Psy_block, Anabiotic, block_rad, block_anom, block_psy, block_time, last_device_type    
