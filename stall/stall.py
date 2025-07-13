@@ -183,15 +183,12 @@ def update_hp_rd(HP, RD):
             int_write(0x6100, 0) ## Номер иконки
             uart.block_time = block_time    
     if not flag_anomaly and not flag_radic:
-        if regen_stat > 0:
-            regen = regen + regen_stat
-        if regen > 0:
+        if regen > 0 and regen_stat > 0:
             regen_up += 1
             HP += 3
             if HP > 10000:
                 HP = 10000
             if regen_up >= 30:
-                regen = regen - regen_stat
                 regen = max(0, round(regen - 0.1, 1))
                 uart.regen = regen
                 regen_up = 0           
