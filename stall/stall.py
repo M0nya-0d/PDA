@@ -161,22 +161,7 @@ def update_hp_rd(HP, RD):
             if art_values[i] > 0:
                 art_values[i] -= 1
                 if art_values[i] == 0:
-                    int_write(art_addresses[i], 27)  # иконка "пусто"
-
-                    # Отменяем эффект
-                    name = art_names[i]
-                    if name == "COMPAS":
-                        apply_effect(-3, -1000, 0, 0)
-                    elif name == "BATARY":
-                        apply_effect(0, 0, -1, -500)
-                    elif name == "KAPLYA":
-                        apply_effect(0, -500, 0, -1000)
-                    elif name == "FLAME":
-                        apply_effect(-4, -1500, 0, 0)
-                    elif name == "JOKER":
-                        apply_effect(0, 0, -5, -2000)
-
-                    art_names[i] = ""  # Очистка имени
+                    art_efeckt(f"DROP {i+1}")
 
         # Возврат значений в глобальные переменные
         art1, art2, art3, art4, art5 = art_values
@@ -198,12 +183,15 @@ def update_hp_rd(HP, RD):
             int_write(0x6100, 0) ## Номер иконки
             uart.block_time = block_time    
     if not flag_anomaly and not flag_radic:
+        if regen_stat > 0:
+            regen = regen + regen_stat
         if regen > 0:
             regen_up += 1
             HP += 3
             if HP > 10000:
                 HP = 10000
             if regen_up >= 30:
+                regen = regen - regen_stat
                 regen = max(0, round(regen - 0.1, 1))
                 uart.regen = regen
                 regen_up = 0           
@@ -245,22 +233,22 @@ def update_hp_rd(HP, RD):
             if rd_up >= 3:
                 RD -= 1
                 rd_up = 0
-            #if hp_up >= 3:    
-                #if HP < 10000:
-                    #HP += 1
-                    #hp_up = 0
+            if hp_up >= 3:    
+                if HP < 10000:
+                    HP += 1
+                    hp_up = 0
         elif RD > 1000 and RD <= 4000:
             if rd_up >= 3:
                 RD -= 1
                 rd_up = 0
-            if hp_up >= 2:
-                HP -= 1
-                hp_up = 0
-                if HP <= 0:
-                    norma = False
-                    HP = 0
-                    RD = 0 
-                    send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x0A]))   
+            #if hp_up >= 2:
+            #    HP -= 1
+            #    hp_up = 0
+            #    if HP <= 0:
+            #        norma = False
+            #        HP = 0
+            #        RD = 0 
+            #        send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x0A]))   
         elif RD > 4000 and RD <= 7000:
             if rd_up >= 2:
                 RD -= 1
@@ -346,7 +334,7 @@ def art_efeckt(device_type):
 
     # Название артефакта -> номер картинки, эффект и удаление эффекта
     artifacts = {
-        # (3, 1000, 0, 0), (+1000 rad, +1000 regen, 0 psy, 0 anom, +3 RD)
+        # (3, 1000, 0, 0), (+10 rad, +10 psy, +50 regen, +30 anom, +2 RD)
         "COMPAS": {
             "value": 3,
             "effect": lambda: apply_effect(100, 100, 50, 30, 2), # далает  +
@@ -411,6 +399,7 @@ def art_efeckt(device_type):
             globals()[name_var] = name
             int_write(addr, artifacts[name]["value"])
             artifacts[name]["effect"]()
+            int_write(0x6011, 1)
             break
 
 def apply_effect(rad=0, psy=0, regen=0, anom=0, rd=0):
