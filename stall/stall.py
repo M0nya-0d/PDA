@@ -1,3 +1,4 @@
+from doctest import COMPARISON_FLAGS
 from email.iterators import typed_subpart_iterator
 import serial
 import time
@@ -41,13 +42,15 @@ Ecologist = 0
 
 block_time = 0
 
-art1 = 120
-art2 = 32
-art3 = 40
-art4 = 150
-art5 = 80
+art1 = art2 = art3 = art4 = art5 = 0
+art1_name = art2_name = art3_name = art4_name = art5_name = ""
+last_device_type = None
 art_up = 0
 flag_art = True
+rad_stat = 0
+regen_stat = 0
+anom_stat = 0
+psy_stat = 0
 
 oasis = False
 norma = True
@@ -134,7 +137,7 @@ def send_text(addr, text):
 
 
 def update_hp_rd(HP, RD):
-    global rd_up, hp_up, oasis, norma, flag_radic, flag_anomaly, radic_up, oasis_up, anomaly_up, arm_psy, arm_anom, arm_rad, regen, regen_up, block_time, block_psy, block_rad, block_anom, art1, art2, art3, art4, art5, art_up, flag_art
+    global rd_up, hp_up, oasis, norma, flag_radic, flag_anomaly, radic_up, oasis_up, anomaly_up, arm_psy, arm_anom, arm_rad, regen, regen_up, block_time, block_psy, block_rad, block_anom, art1, art2, art3, art4, art5, art_up, flag_art, art1_name, art2_name, art3_name, art4_name, art5_name
     rd_up += 1
     hp_up += 1
     if flag_art:
@@ -147,19 +150,39 @@ def update_hp_rd(HP, RD):
         #send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x10]))
     if flag_art and art_up >= 60:
         art_values = [art1, art2, art3, art4, art5]
+        art_names  = [art1_name, art2_name, art3_name, art4_name, art5_name]
         art_addresses = [0x7000, 0x7001, 0x7002, 0x7003, 0x7004]
 
         for i in range(5):
             if art_values[i] > 0:
                 art_values[i] -= 1
                 if art_values[i] == 0:
-                    int_write(art_addresses[i], 27)  # сменить иконку на "пусто"
+                    int_write(art_addresses[i], 27)  # иконка "пусто"
 
+                    # Отменяем эффект
+                    name = art_names[i]
+                    if name == "COMPAS":
+                        apply_effect(-3, -1000, 0, 0)
+                    elif name == "BATARY":
+                        apply_effect(0, 0, -1, -500)
+                    elif name == "KAPLYA":
+                        apply_effect(0, -500, 0, -1000)
+                    elif name == "FLAME":
+                        apply_effect(-4, -1500, 0, 0)
+                    elif name == "JOKER":
+                        apply_effect(0, 0, -5, -2000)
+
+                    art_names[i] = ""  # Очистка имени
+
+        # Возврат значений в глобальные переменные
         art1, art2, art3, art4, art5 = art_values
+        art1_name, art2_name, art3_name, art4_name, art5_name = art_names
         art_up = 0
-         # Проверка: остались ли артефакты
+
+        # Проверка: все ли слоты пусты
         if all(val == 0 for val in art_values):
-            flag_art = False   
+            flag_art = False
+            int_write(0x6011, 0)
 
     if block_time > 0:
         block_time -= 1
@@ -286,6 +309,8 @@ def radic():
             HP -= 50
 
 def art_type(device_type):
+    global last_device_type
+    last_device_type = device_type
     handlers = {
         "COMPAS": lambda: int_write(0x7005, 3),
         "BATARY": lambda: int_write(0x7005, 13),
@@ -305,6 +330,90 @@ def art_type(device_type):
         handlers[device_type]()
     else:
         print(f"[ART TYPE] ❌ Неизвестный тип устройства: {device_type}")
+
+
+
+def art_efeckt(device_type):
+    global art1, art2, art3, art4, art5
+    global art1_name, art2_name, art3_name, art4_name, art5_name
+    global rad_stat, regen_stat, psy_stat, anom_stat
+
+    # Название артефакта -> номер картинки, эффект и удаление эффекта
+    artifacts = {
+        "COMPAS": {
+            "value": 3,
+            "effect": lambda: apply_effect(3, 1000, 0, 0),
+            "remove": lambda: apply_effect(-3, -1000, 0, 0),
+        },
+        "BATARY": {
+            "value": 4,
+            "effect": lambda: apply_effect(0, 0, 1, 500),
+            "remove": lambda: apply_effect(0, 0, -1, -500),
+        },
+        "KAPLYA": {
+            "value": 5,
+            "effect": lambda: apply_effect(0, 500, 0, 1000),
+            "remove": lambda: apply_effect(0, -500, 0, -1000),
+        },
+        "FLAME": {
+            "value": 6,
+            "effect": lambda: apply_effect(4, 1500, 0, 0),
+            "remove": lambda: apply_effect(-4, -1500, 0, 0),
+        },
+        "JOKER": {
+            "value": 7,
+            "effect": lambda: apply_effect(0, 0, 5, 2000),
+            "remove": lambda: apply_effect(0, 0, -5, -2000),
+        },
+    }
+
+    # Слоты: (счетчик, имя переменной, имя артефакта, адрес)
+    art_slots = [
+        ("art1", "art1_name", 0x7000),
+        ("art2", "art2_name", 0x7001),
+        ("art3", "art3_name", 0x7002),
+        ("art4", "art4_name", 0x7003),
+        ("art5", "art5_name", 0x7004),
+    ]
+
+    # === DROP N ===
+    if device_type.startswith("DROP "):
+        try:
+            index = int(device_type.split()[1]) - 1
+            if 0 <= index < 5:
+                var_name, name_var, addr = art_slots[index]
+                if globals()[var_name] != 0:
+                    art_name = globals()[name_var]
+                    if art_name in artifacts:
+                        artifacts[art_name]["remove"]()
+                    globals()[var_name] = 0
+                    globals()[name_var] = ""
+                    int_write(addr, 24)
+        except:
+            pass
+        return
+
+    # === USE XXX ===
+    name = device_type.replace(" USE", "")
+    if name not in artifacts:
+        return
+
+    for var_name, name_var, addr in art_slots:
+        if globals()[var_name] == 0:
+            globals()[var_name] = 240
+            globals()[name_var] = name
+            int_write(addr, artifacts[name]["value"])
+            artifacts[name]["effect"]()
+            break
+
+def apply_effect(rad=0, psy=0, regen=0, anom=0):
+    global rad_stat, psy_stat, regen_stat, anom_stat
+    rad_stat += rad
+    psy_stat += psy
+    regen_stat += regen
+    anom_stat += anom
+
+         
 
 def resp():
     global oasis, oasis_up
@@ -349,7 +458,7 @@ def save_params(filename, data):
         json.dump(data, f, indent=4)
 
 def main():
-    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, number_pda, current_nik, arm_anom, arm_psy, arm_rad, regen, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, B190, Drink, Psy_block, Ip2, Anabiotic, block_time, block_psy, block_rad, block_anom, number_pda
+    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, number_pda, current_nik, arm_anom, arm_psy, arm_rad, regen, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, B190, Drink, Psy_block, Ip2, Anabiotic, block_time, block_psy, block_rad, block_anom, number_pda, last_device_type
     all_params = load_params("/home/orangepi/PDA/stall/param.json")
     ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=0.01)
 
@@ -542,6 +651,9 @@ def main():
                             params = uart.params
                             buffer = bytearray()
             elif s == jdy_ser:
+                valid_artifacts = {
+                    "COMPAS", "BATARY", "KAPLYA", "BUBBLE", "FLAME",
+                    "JOKER", "GOLD", "SHADOW", "STORM", "CRYSTAL"}
                 while jdy_ser.in_waiting:
                     try:
                         line = jdy_ser.readline().decode(errors='ignore').strip()
@@ -554,7 +666,17 @@ def main():
                             elif line == "Anomaly":
                                 anomaly()
                             elif line == "PSY":
-                                psy()
+                                psy()   
+                            elif any(line.startswith(prefix) for prefix in valid_artifacts):
+                                parts = line.split()
+                                if len(parts) == 2:
+                                    type_device, device_number = parts
+                                    if type_device in valid_artifacts:
+                                        print(f"[JDY] 🔍 Найден артефакт: {type_device} с номером {device_number}")
+                                        last_device_type = type_device
+                                        art_type(type_device)
+                                    else:
+                                        print(f"[JDY] ⚠️ Неизвестный тип артефакта: {type_device}") 
                             elif line.startswith("PDA"):
                                 parts = line.split()
                                 if len(parts) >= 3:
