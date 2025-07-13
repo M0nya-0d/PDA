@@ -163,6 +163,7 @@ def update_hp_rd(HP, RD):
                 if art_values[i] == 0:
                     globals()[f"art{i+1}_name"] = art_names[i]
                     art_efeckt(f"DROP {i+1}")
+                    int_write(art_addresses[i], 27)
 
         # Возврат значений в глобальные переменные
         art1, art2, art3, art4, art5 = art_values
@@ -336,7 +337,7 @@ def art_efeckt(device_type):
         "COMPAS": {
             "value": 3,
             "effect": lambda: apply_effect(100, 100, 50, 30, 2), # далает  +
-            "remove": lambda: apply_effect(-100, -100, 50, 30, -2), # далает -
+            "remove": lambda: apply_effect(-100, -100, -50, -30, -2), # далает -
         },
         "BATARY": {
             "value": 4,
