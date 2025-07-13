@@ -329,11 +329,11 @@ def art_type(device_type):
 
 def art_efeckt(device_type):
     int_write(0x7005, 31)
-    global last_device_number, last_device_type
+    global last_device_number, last_device_type, flag_art 
     global art1, art2, art3, art4, art5
     global art1_name, art2_name, art3_name, art4_name, art5_name
     global rad_stat, regen_stat, psy_stat, anom_stat, RD_stat
-
+    flag_art = True
     # Название артефакта -> номер картинки, эффект и удаление эффекта
     artifacts = {
         # (3, 1000, 0, 0), (+10 rad, +10 psy, +50 regen, +30 anom, +2 RD)
