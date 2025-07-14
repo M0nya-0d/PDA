@@ -517,7 +517,27 @@ def KDA(device_type, device_number):
         print(f"[ART] ⚠️ Ошибка при добавлении в очередь: {e}")
 
 
+def DELL(index):
+    global active_arts
 
+    if index == 0:
+        if active_arts[0] is not None:
+            print(f"🗑️ Удаляем ячейку 1: {active_arts[0]}")
+            active_arts[0] = None
+            int_write(0x7006, 0)  # Сбрасываем картинку слота 1
+        else:
+            print("❌ Ячейка 1 уже пуста")
+
+    elif index == 1:
+        if active_arts[1] is not None:
+            print(f"🗑️ Удаляем ячейку 2: {active_arts[1]}")
+            active_arts[1] = None
+            int_write(0x7007, 0)  # Сбрасываем картинку слота 2
+        else:
+            print("❌ Ячейка 2 уже пуста")
+
+    else:
+        print("❌ Неверный индекс ячейки (может быть только 0 или 1)")
 
 
 def load_params(filename):
@@ -705,7 +725,7 @@ def main():
                         if len(buffer) >= plen + 3:
                             packet = buffer[:plen + 3]
                             #uart.process_packet(packet, send_text, int_write, KDA)
-                            HP, RD, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, arm_rad, arm_psy, arm_anom, regen, B190, Drink, Ip2, Psy_block, Anabiotic, block_rad, block_anom, block_psy, block_time, last_device_type = uart.process_packet(packet, send_text, int_write, KDA, art_efeckt)
+                            HP, RD, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, arm_rad, arm_psy, arm_anom, regen, B190, Drink, Ip2, Psy_block, Anabiotic, block_rad, block_anom, block_psy, block_time, last_device_type = uart.process_packet(packet, send_text, int_write, KDA, art_efeckt, DELL)
                             antirad, vodka = uart.antirad, uart.vodka
                             bint = uart.bint
                             apteka20, apteka30, apteka50 = uart.apteka20, uart.apteka30, uart.apteka50

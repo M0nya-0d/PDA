@@ -7,7 +7,7 @@ import uart
 serial_port = "/dev/ttyS5"
 baud_rate = 115200
 
-def process_packet(packet, send_text, int_write, KDA, art_efeckt):
+def process_packet(packet, send_text, int_write, KDA, art_efeckt, DELL):
     global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, current_nik, number_pda, arm_rad, arm_psy, arm_anom, regen, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, B190, Drink, Ip2, Psy_block, Anabiotic, block_rad, block_anom, block_psy, block_time, last_device_type, last_device_number
     default_return = (HP, RD, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, arm_rad, arm_psy, arm_anom, regen)
     if not (packet[0] == 0x5A and packet[1] == 0xA5):
@@ -27,6 +27,18 @@ def process_packet(packet, send_text, int_write, KDA, art_efeckt):
             print("🚀 Функция KDA запущена")
         except Exception as e:
             print(f"❌ Ошибка при запуске KDA: {e}")
+
+    if vp == 0x7023 and value == 1:
+        try:
+            DELL(0)        
+        except Exception as e:
+            print(f"❌ Ошибка при запуске DELL: {e}")
+
+    if vp == 0x70234 and value == 1:
+        try:
+            DELL(1)        
+        except Exception as e:
+            print(f"❌ Ошибка при запуске DELL: {e}")
 
     if vp == 0x7022 and value == 1:
         try:
