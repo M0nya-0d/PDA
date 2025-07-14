@@ -45,7 +45,7 @@ def process_packet(packet, send_text, int_write, KDA, art_efeckt, DELL):
             print(f"{last_device_type} {last_device_number} пришло 7022 ")
             KDA(last_device_type, last_device_number)  # вызываем вашу функцию
             print("Ложим в контейнер")
-            int_write(0x7006, 0)
+            #int_write(0x7006, 0)
         except Exception as e:
             print(f"Ошибка работы с контейнером {e}")        
     
