@@ -43,14 +43,13 @@ def process_packet(packet, send_text, int_write, KDA, art_efeckt, DELL):
     if vp == 0x7022 and value == 1:
         try:
             print(f"{last_device_type} {last_device_number} пришло 7022 ")
-            KDA(last_device_type, last_device_number)  # вызываем вашу функцию
+            KDA(last_device_type, last_device_number)  # вызываем  функцию
             print("Ложим в контейнер")
-            #int_write(0x7006, 0)
         except Exception as e:
             print(f"Ошибка работы с контейнером {e}")        
     
     if vp == 0x7021 and value == 1:
-        print(f"uart.py: last_device_type = {last_device_type!r}")
+        #print(f"uart.py: last_device_type = {last_device_type!r}")
         try:
             if last_device_type:
                 print(f"✅ Отправляем {last_device_type} в art_efeckt как USE")
