@@ -1,58 +1,75 @@
 {
-  "77": {
-    "Nik-name": "vas9",
-    "HP": 6500,
-    "RD": 0,
-    "PSY": 0,
-    "Anomaly": 0,
-    "Radic": 0,
-    "Regen": 0,
-    "Medicina": [
-      {"name": "B190", "count": 2},
-      {"name": "Drink", "count": 2},
-      {"name": "Psy_block", "count": 2},
-      {"name": "Ip2", "count": 2},
-
-      {"name": "Antirad", "count": 2},
-      {"name": "Anabiotic", "count": 1},
-      {"name": "Vodka", "count": 4},
-
-      {"name": "Bint", "count": 2},
-      {"name": "Apteka20", "count": 2},
-      {"name": "Apteka30", "count": 2},
-      {"name": "Apteka50", "count": 2},
-
-      {"name": "Jacket", "count": 5},
-      {"name": "Merc", "count": 5},
-      {"name": "Exoskeleton", "count": 1},
-      {"name": "Seva", "count": 1},
-      {"name": "Stalker", "count": 1},
-      {"name": "Ecologist", "count": 1}
-    ]
+"77": {
+  "Nik-name": "vas9",
+  "HP": 6500,
+  "RD": 0,
+  "PSY": 0,
+  "Anomaly": 0,
+  "Radic": 0,
+  "Regen": 0,
+  "ART1": {
+    "type": "COMPAS",
+    "number": 5
   },
+  "ART2": {
+    "type": "JOKER",
+    "number": 1
+  },
+  "Medicina": [
+    {"name": "B190", "count": 2},
+    {"name": "Drink", "count": 2},
+    {"name": "Psy_block", "count": 2},
+    {"name": "Ip2", "count": 2},
+    {"name": "Antirad", "count": 2},
+    {"name": "Anabiotic", "count": 1},
+    {"name": "Vodka", "count": 4},
+    {"name": "Bint", "count": 2},
+    {"name": "Apteka20", "count": 2},
+    {"name": "Apteka30", "count": 2},
+    {"name": "Apteka50", "count": 2},
+    {"name": "Jacket", "count": 5},
+    {"name": "Merc", "count": 5},
+    {"name": "Exoskeleton", "count": 1},
+    {"name": "Seva", "count": 1},
+    {"name": "Stalker", "count": 1},
+    {"name": "Ecologist", "count": 1}
+  ]
+}
+,
   "71": {
-    "Nik-name": "pet9",
-    "HP": 4500,
-    "RD": 7200,
-    "PSY": 0,
-    "Anomaly": 0,
-    "Radic": 0,
-    "Regen": 0,
-    "Medicina": [
-      {"name": "B190", "count": 2},
-      {"name": "Antirad", "count": 2},
-      {"name": "Anabiotic", "count": 1},
-      {"name": "Vodka", "count": 4},
-      {"name": "Bint", "count": 2},
-      {"name": "Apteka20", "count": 2},
-      {"name": "Apteka30", "count": 2},
-      {"name": "Apteka50", "count": 2},
-      {"name": "Jacket", "count": 1},
-      {"name": "Merc", "count": 1},
-      {"name": "Exoskeleton", "count": 1},
-      {"name": "Seva", "count": 1},
-      {"name": "Stalker", "count": 1},
-      {"name": "Ecologist", "count": 1}
+  "Nik-name": "psas9",
+  "HP": 6500,
+  "RD": 0,
+  "PSY": 0,
+  "Anomaly": 0,
+  "Radic": 0,
+  "Regen": 0,
+  "ART1": {
+    "type": "COMPAS",
+    "number": 5
+  },
+  "ART2": {
+    "type": "JOKER",
+    "number": 1
+  },
+  "Medicina": [
+    {"name": "B190", "count": 2},
+    {"name": "Drink", "count": 2},
+    {"name": "Psy_block", "count": 2},
+    {"name": "Ip2", "count": 2},
+    {"name": "Antirad", "count": 2},
+    {"name": "Anabiotic", "count": 1},
+    {"name": "Vodka", "count": 4},
+    {"name": "Bint", "count": 2},
+    {"name": "Apteka20", "count": 2},
+    {"name": "Apteka30", "count": 2},
+    {"name": "Apteka50", "count": 2},
+    {"name": "Jacket", "count": 5},
+    {"name": "Merc", "count": 5},
+    {"name": "Exoskeleton", "count": 1},
+    {"name": "Seva", "count": 1},
+    {"name": "Stalker", "count": 1},
+    {"name": "Ecologist", "count": 1}
     ]
   }
 }

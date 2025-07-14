@@ -495,11 +495,11 @@ def KDA(device_type, device_number):
 
     # Проверка и регистрация в слот
     if active_arts[0] is None:
-        active_arts[0] = last_device_type  # сохраняем только тип
+        active_arts[0] = last_device_type, last_device_number  # сохраняем только тип
         int_write(0x7006, img_code)
         print(f"[ART] ✅ Слот 1: {last_device_type}{last_device_number}, картинка {img_code}")
     elif active_arts[1] is None:
-        active_arts[1] = last_device_type  # сохраняем только тип
+        active_arts[1] = last_device_type, last_device_number  # сохраняем только тип
         int_write(0x7007, img_code)
         print(f"[ART] ✅ Слот 2: {last_device_type}{last_device_number}, картинка {img_code}")
     else:
@@ -603,6 +603,15 @@ def main():
     arm_rad = params["Radic"]
     arm_anom = params["Anomaly"]
     regen = params["Regen"]
+
+    if "ART1" in params and isinstance(params["ART1"], dict):
+        art1 = params["ART1"]
+        if "type" in art1 and "number" in art1:
+            active_arts[0] = (art1["type"], art1["number"])
+    if "ART2" in params and isinstance(params["ART2"], dict):
+        art2 = params["ART2"]
+        if "type" in art2 and "number" in art2:
+            active_arts[1] = (art2["type"], art2["number"])        
 
     for med in params.get("Medicina", []):
         if med["name"] == "B190":
@@ -802,6 +811,8 @@ def main():
             params["Radic"] = arm_rad
             params["Anomaly"] = arm_anom
             params["Regen"] = regen
+            params["ART1"] = active_arts[0] if active_arts[0] else ""
+            params["ART2"] = active_arts[1] if active_arts[1] else ""
             for med in params.get("Medicina", []): # записал в файл
                 
                 if med["name"] == "Antirad":
