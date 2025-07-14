@@ -28,13 +28,13 @@ def process_packet(packet, send_text, int_write, KDA, art_efeckt, DELL):
         except Exception as e:
             print(f"❌ Ошибка при запуске KDA: {e}")
 
-    if vp == 0x7023 and value == 1:
+    if vp == 0x7028 and value == 1:   # арт 1 удаляем 
         try:
             DELL(0)        
         except Exception as e:
             print(f"❌ Ошибка при запуске DELL: {e}")
 
-    if vp == 0x70234 and value == 1:
+    if vp == 0x7029 and value == 1:    # арт 2 удаляем 
         try:
             DELL(1)        
         except Exception as e:
