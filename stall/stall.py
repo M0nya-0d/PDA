@@ -749,9 +749,11 @@ def main():
                                         print(f"[JDY] 🔍 Найден артефакт: {type_device} с номером {device_number}")
                                         last_device_type = type_device
                                         last_device_number = device_number
+                                        uart.last_device_type = last_device_type
+                                        uart.last_device_number = last_device_number
                                         art_type(type_device)
                                         art_uron(type_device)
-                                        uart.last_device_type = last_device_type
+                                        
                                         
                                     else:
                                         print(f"[JDY] ⚠️ Неизвестный тип артефакта: {type_device}") 
