@@ -8,13 +8,11 @@
   "Radic": 0,
   "Regen": 0,
   "ART-1": {
-    "type": "COMPAS",
-    "number": 5
-  },
+    "type": null,
+    "number": null},
   "ART-2": {
-    "type": "JOKER",
-    "number": 1
-  },
+    "type": null,
+    "number": null},
   "Medicina": [
     {"name": "B190", "count": 2},
     {"name": "Drink", "count": 2},

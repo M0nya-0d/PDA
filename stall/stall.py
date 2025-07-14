@@ -332,17 +332,17 @@ def art_type(device_type):
 
 def art_uron(device_type):
     global RD
-    uron = {
-        "COMPAS": lambda: 3,
-        "BATARY": lambda: 3,
-        "KAPLYA": lambda: 4,
-        "BUBBLE": lambda: 3,
-        "FLAME": lambda: 5,
-        "JOKER": lambda: 5,
-        "GOLD": lambda: 3,
-        "SHADOW": lambda: 3,
-        "STORM": lambda: 4,
-        "CRYSTAL": lambda: 1,
+    uron = {    # если арт не в контейнере будет наносить всем вокруг радик
+        "COMPAS": lambda: 20,
+        "BATARY": lambda: 20,
+        "KAPLYA": lambda: 20,
+        "BUBBLE": lambda: 20,
+        "FLAME": lambda: 20,
+        "JOKER": lambda: 20,
+        "GOLD": lambda: 20,
+        "SHADOW": lambda: 20,
+        "STORM": lambda: 20,
+        "CRYSTAL": lambda: 20,
     }
 
     if device_type in uron:
