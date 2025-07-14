@@ -471,8 +471,8 @@ def psy():
 def KDA(device_type, device_number):
     global active_arts, last_device_type, last_device_number, number_pda, jdy_send_queue
 
-    last_device_type = device_type
-    last_device_number = device_number
+    last_device_type = uart.last_device_type
+    last_device_number = uart.last_device_number
 
     # Таблица соответствия типов и номеров картинок
     image_map = {
@@ -495,19 +495,19 @@ def KDA(device_type, device_number):
 
     # Проверка и регистрация в слот
     if active_arts[0] is None:
-        active_arts[0] = device_type  # сохраняем только тип
+        active_arts[0] = last_device_type  # сохраняем только тип
         int_write(0x7006, img_code)
-        print(f"[ART] ✅ Слот 1: {device_type}{device_number}, картинка {img_code}")
+        print(f"[ART] ✅ Слот 1: {last_device_type}{last_device_number}, картинка {img_code}")
     elif active_arts[1] is None:
-        active_arts[1] = device_type  # сохраняем только тип
+        active_arts[1] = last_device_type  # сохраняем только тип
         int_write(0x7007, img_code)
-        print(f"[ART] ✅ Слот 2: {device_type}{device_number}, картинка {img_code}")
+        print(f"[ART] ✅ Слот 2: {last_device_type}{last_device_number}, картинка {img_code}")
     else:
         print("[ART] ⚠️ Нет свободных слотов")
         return
 
     # Подготовка и отправка команды сохранения
-    message = f"KDA {number_pda} {device_type}{device_number}save"
+    message = f"KDA {number_pda} {last_device_type}{last_device_number}save"
     print(f"[ART] 📡 Подготовлено к отправке: {message}")
 
     try:
