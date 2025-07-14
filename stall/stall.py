@@ -528,6 +528,7 @@ def DELL(index):
             jdy_send_queue.put(message)
             active_arts[0] = None
             int_write(0x7006, 31)  # Сброс картинки слота 1
+            params["ART-1"] = {"type": None, "number": None}
         else:
             print("❌ Ячейка 1 уже пуста")
 
@@ -539,6 +540,7 @@ def DELL(index):
             jdy_send_queue.put(message)
             active_arts[1] = None
             int_write(0x7007, 31)  # Сброс картинки слота 2
+            params["ART-2"] = {"type": None, "number": None}
         else:
             print("❌ Ячейка 2 уже пуста")
 
@@ -812,8 +814,8 @@ def main():
             params["Radic"] = arm_rad
             params["Anomaly"] = arm_anom
             params["Regen"] = regen
-            params["ART-1"] = active_arts[0] if active_arts[0] else ""
-            params["ART-2"] = active_arts[1] if active_arts[1] else ""
+            #params["ART-1"] = active_arts[0] if active_arts[0] else ""
+            #params["ART-2"] = active_arts[1] if active_arts[1] else ""
             for med in params.get("Medicina", []): # записал в файл
                 
                 if med["name"] == "Antirad":
