@@ -550,7 +550,7 @@ def save_params(filename, data):
         json.dump(data, f, indent=4)
 
 def main():
-    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, number_pda, current_nik, arm_anom, arm_psy, arm_rad, regen, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, B190, Drink, Psy_block, Ip2, Anabiotic, block_time, block_psy, block_rad, block_anom, number_pda, last_device_type, last_device_number
+    global HP, RD, antirad, params, vodka, bint, apteka20, apteka30, apteka50, number_pda, current_nik, arm_anom, arm_psy, arm_rad, regen, Jacket, Merc, Exoskeleton, Seva, Stalker, Ecologist, B190, Drink, Psy_block, Ip2, Anabiotic, block_time, block_psy, block_rad, block_anom, number_pda, last_device_type, last_device_number, active_arts 
     all_params = load_params("/home/orangepi/PDA/stall/param.json")
     ser = serial.Serial(serial_port, baudrate=baud_rate, timeout=0.01)
 
@@ -603,15 +603,9 @@ def main():
     arm_rad = params["Radic"]
     arm_anom = params["Anomaly"]
     regen = params["Regen"]
-
-    if "ART1" in params and isinstance(params["ART1"], dict):
-        art1 = params["ART1"]
-        if "type" in art1 and "number" in art1:
-            active_arts[0] = (art1["type"], art1["number"])
-    if "ART2" in params and isinstance(params["ART2"], dict):
-        art2 = params["ART2"]
-        if "type" in art2 and "number" in art2:
-            active_arts[1] = (art2["type"], art2["number"])        
+    active_arts[0] = (params["ART-1"]["type"], params["ART-1"]["number"])
+    active_arts[1] = (params["ART-2"]["type"], params["ART-2"]["number"])
+          
 
     for med in params.get("Medicina", []):
         if med["name"] == "B190":
@@ -811,8 +805,8 @@ def main():
             params["Radic"] = arm_rad
             params["Anomaly"] = arm_anom
             params["Regen"] = regen
-            params["ART1"] = active_arts[0] if active_arts[0] else ""
-            params["ART2"] = active_arts[1] if active_arts[1] else ""
+            params["ART-1"] = active_arts[0] if active_arts[0] else ""
+            params["ART-2"] = active_arts[1] if active_arts[1] else ""
             for med in params.get("Medicina", []): # записал в файл
                 
                 if med["name"] == "Antirad":

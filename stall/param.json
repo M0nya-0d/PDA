@@ -7,11 +7,11 @@
   "Anomaly": 0,
   "Radic": 0,
   "Regen": 0,
-  "ART1": {
+  "ART-1": {
     "type": "COMPAS",
     "number": 5
   },
-  "ART2": {
+  "ART-2": {
     "type": "JOKER",
     "number": 1
   },
