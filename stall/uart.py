@@ -30,7 +30,7 @@ def process_packet(packet, send_text, int_write, KDA, art_efeckt):
 
     if vp == 0x7022 and value == 1:
         try:
-            #KDA()  # вызываем вашу функцию
+            KDA()  # вызываем вашу функцию
             print("Ложим в контейнер")
             int_write(0x7006, 0)
         except Exception as e:

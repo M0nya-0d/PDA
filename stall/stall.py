@@ -46,6 +46,8 @@ art1 = art2 = art3 = art4 = art5 = 0
 art1_name = art2_name = art3_name = art4_name = art5_name = ""
 last_device_type = None
 last_device_number = None
+active_arts = [None, None]
+device_jpg = 0
 art_up = 0
 flag_art = True
 rad_stat = 0
@@ -327,6 +329,29 @@ def art_type(device_type):
 
 
 
+
+def art_uron(device_type):
+    global RD
+    uron = {
+        "COMPAS": lambda: 3,
+        "BATARY": lambda: 3,
+        "KAPLYA": lambda: 4,
+        "BUBBLE": lambda: 3,
+        "FLAME": lambda: 5,
+        "JOKER": lambda: 5,
+        "GOLD": lambda: 3,
+        "SHADOW": lambda: 3,
+        "STORM": lambda: 4,
+        "CRYSTAL": lambda: 1,
+    }
+
+    if device_type in uron:
+        damage = uron[device_type]()
+        RD += damage
+        print(f"[URON] +{damage} RD от {device_type}. Итого RD: {RD}")
+    else:
+        print(f"[URON] Неизвестный тип устройства: {device_type}") 
+
 def art_efeckt(device_type):
     global last_device_number, last_device_type, flag_art 
     global art1, art2, art3, art4, art5
@@ -384,7 +409,7 @@ def art_efeckt(device_type):
                         artifacts[art_name]["remove"]()
                     globals()[var_name] = 0
                     globals()[name_var] = ""
-                    int_write(addr, 24)
+                    int_write(addr, 27)
         except:
             pass
         return
@@ -394,7 +419,7 @@ def art_efeckt(device_type):
     if name not in artifacts:
         return
     int_write(0x7005, 31)
-    
+
     for var_name, name_var, addr in art_slots:
         if globals()[var_name] == 0:
             globals()[var_name] = 4   # минут эффекта
@@ -443,15 +468,57 @@ def anomaly():
 def psy():
     print("PSY")
 
-def KDA():
-    global number_pda, jdy_ser
-    message = f"KDA {number_pda} POISK"
-    print(f"[KDA] 📡 {message}")
+def KDA(device_type, device_number):
+    global active_arts, last_device_type, last_device_number, number_pda, jdy_send_queue
+
+    last_device_type = device_type
+    last_device_number = device_number
+
+    # Таблица соответствия типов и номеров картинок
+    image_map = {
+        "COMPAS": 3,
+        "BATARY": 13,
+        "KAPLYA": 7,
+        "BUBBLE": 6,
+        "FLAME": 9,
+        "JOKER": 15,
+        "GOLD": 18,
+        "SHADOW": 11,
+        "STORM": 17,
+        "CRYSTAL": 5
+    }
+
+    img_code = image_map.get(device_type, 0)
+    if img_code == 0:
+        print(f"[ART] ❌ Неизвестный тип: {device_type}")
+        return
+
+    # Проверка и регистрация в слот
+    if active_arts[0] is None:
+        active_arts[0] = device_type  # сохраняем только тип
+        int_write(0x7006, img_code)
+        print(f"[ART] ✅ Слот 1: {device_type}{device_number}, картинка {img_code}")
+    elif active_arts[1] is None:
+        active_arts[1] = device_type  # сохраняем только тип
+        int_write(0x7007, img_code)
+        print(f"[ART] ✅ Слот 2: {device_type}{device_number}, картинка {img_code}")
+    else:
+        print("[ART] ⚠️ Нет свободных слотов")
+        return
+
+    # Подготовка и отправка команды сохранения
+    message = f"KDA {number_pda} {device_type}{device_number}save"
+    print(f"[ART] 📡 Подготовлено к отправке: {message}")
+
     try:
-        jdy_ser.write((message + "\n").encode("utf-8"))
-        print(f"[KDA] ⬅️ отправка: {message}")
+        jdy_send_queue.put(message)
+        print(f"[ART] ⬅️ Добавлено в очередь: {message}")
     except Exception as e:
-        print(f"[KDA] ⚠️ Ошибка отправки: {e}")
+        print(f"[ART] ⚠️ Ошибка при добавлении в очередь: {e}")
+
+
+
+
 
 def load_params(filename):
     with open(filename, "r") as f:
@@ -683,6 +750,7 @@ def main():
                                         last_device_type = type_device
                                         last_device_number = device_number
                                         art_type(type_device)
+                                        art_uron(type_device)
                                         uart.last_device_type = last_device_type
                                         
                                     else:
