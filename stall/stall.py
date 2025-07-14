@@ -494,11 +494,11 @@ def KDA(device_type, device_number):
         return
 
     # Проверка и регистрация в слот
-    if active_arts[0] is None:
+    if active_arts[0] is None or active_arts[0] == (None, None):
         active_arts[0] = last_device_type, last_device_number  # сохраняем только тип
         int_write(0x7006, img_code)
         print(f"[ART] ✅ Слот 1: {last_device_type}{last_device_number}, картинка {img_code}")
-    elif active_arts[1] is None:
+    elif active_arts[1] is None or active_arts[1] == (None, None):
         active_arts[1] = last_device_type, last_device_number  # сохраняем только тип
         int_write(0x7007, img_code)
         print(f"[ART] ✅ Слот 2: {last_device_type}{last_device_number}, картинка {img_code}")
