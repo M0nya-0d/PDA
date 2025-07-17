@@ -505,10 +505,12 @@ def KDA(device_type, device_number):
     if active_arts[0] is None or active_arts[0] == (None, None):
         active_arts[0] = last_device_type, last_device_number  # сохраняем только тип
         int_write(0x7006, img_code)
+        params["ART-1"] = {"type": last_device_type, "number": last_device_number}
         print(f"[ART] ✅ Слот 1: {last_device_type}{last_device_number}, картинка {img_code}")
     elif active_arts[1] is None or active_arts[1] == (None, None):
         active_arts[1] = last_device_type, last_device_number  # сохраняем только тип
         int_write(0x7007, img_code)
+        params["ART-2"] = {"type": last_device_type, "number": last_device_number}
         print(f"[ART] ✅ Слот 2: {last_device_type}{last_device_number}, картинка {img_code}")
     else:
         print("[ART] ⚠️ Нет свободных слотов")
@@ -523,7 +525,13 @@ def KDA(device_type, device_number):
         print(f"[ART] ⬅️ Добавлено в очередь: {message}")
     except Exception as e:
         print(f"[ART] ⚠️ Ошибка при добавлении в очередь: {e}")
-
+        
+    try:
+        with open("param.json", "w") as f:
+            json.dump(params, f, indent=4)
+            print("[ART] 💾 Слоты сохранены в param.json")
+    except Exception as e:
+        print(f"[ART] ⚠️ Ошибка при сохранении param.json: {e}")
 
 def DELL(index):
     global active_arts
