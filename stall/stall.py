@@ -763,8 +763,10 @@ def main():
             try:
                 if jdy_ser.is_open:
                     print(f"[KDA] ⬅️ отправка: {msg}")
-                    jdy_ser.write((msg + "\n").encode("utf-8"))
-                    jdy_ser.flush()
+                    for ch in msg + "\n":
+                        jdy_ser.write(ch.encode("utf-8"))
+                        jdy_ser.flush()
+                        time.sleep(0.05)
                 else:
                     print("[KDA] ❌ Порт закрыт")
             except Exception as e:
