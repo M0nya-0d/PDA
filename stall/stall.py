@@ -249,7 +249,9 @@ def update_hp_rd(HP, RD):
                 if HP <= 0:
                     norma = False
                     HP = 0
-                    RD = 0 
+                    RD = 0
+                    DELL(1)
+                    DELL(2) 
                     send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x0A]))   
         elif RD > 4000 and RD <= 7000:
             if rd_up >= 2:
@@ -262,6 +264,8 @@ def update_hp_rd(HP, RD):
                     norma = False
                     HP = 0
                     RD = 0
+                    DELL(1)
+                    DELL(2)
                     send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x0A]))
         elif RD > 7000 and RD <= 8000:
             HP -= 10
@@ -269,6 +273,8 @@ def update_hp_rd(HP, RD):
                 norma = False
                 HP = 0
                 RD = 0
+                DELL(1)
+                DELL(2)
                 send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x0A]))
         elif RD > 8000 and RD <= 15000:
             HP -= 50
@@ -276,6 +282,8 @@ def update_hp_rd(HP, RD):
                 norma = False
                 HP = 0
                 RD = 0 
+                DELL(1)
+                DELL(2)
                 send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0x84, 0x5A, 0x01, 0x00, 0x0A]))
         elif RD == 0 and HP < 10000:
             HP += 1
