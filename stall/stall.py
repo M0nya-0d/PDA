@@ -529,28 +529,28 @@ def DELL(index):
     global active_arts
 
     if index == 0:
-        if active_arts[0] is not None:
-            device_type, device_number = active_arts[0]
-            print(f"🗑️ Удаляем ячейку 1: {device_type}{device_number}")
-            message = f"KDA {number_pda} {device_type}{device_number}dell"
-            jdy_send_queue.put(message)
-            active_arts[0] = None
-            int_write(0x7006, 31)  # Сброс картинки слота 1
-            params["ART-1"] = {"type": None, "number": None}
-        else:
-            print("❌ Ячейка 1 уже пуста")
+        #if active_arts[0] is not None:
+        device_type, device_number = active_arts[0]
+        print(f"🗑️ Удаляем ячейку 1: {device_type}{device_number}")
+        message = f"KDA {number_pda} {device_type}{device_number}dell"
+        jdy_send_queue.put(message)
+        active_arts[0] = None
+        int_write(0x7006, 31)  # Сброс картинки слота 1
+        params["ART-1"] = {"type": None, "number": None}
+        #else:
+            #print("❌ Ячейка 1 уже пуста")
 
     elif index == 1:
-        if active_arts[1] is not None:
-            device_type, device_number = active_arts[1]
-            print(f"🗑️ Удаляем ячейку 2: {device_type}{device_number}")
-            message = f"KDA {number_pda} {device_type}{device_number}dell"
-            jdy_send_queue.put(message)
-            active_arts[1] = None
-            int_write(0x7007, 31)  # Сброс картинки слота 2
-            params["ART-2"] = {"type": None, "number": None}
-        else:
-            print("❌ Ячейка 2 уже пуста")
+        #if active_arts[1] is not None:
+        device_type, device_number = active_arts[1]
+        print(f"🗑️ Удаляем ячейку 2: {device_type}{device_number}")
+        message = f"KDA {number_pda} {device_type}{device_number}dell"
+        jdy_send_queue.put(message)
+        active_arts[1] = None
+        int_write(0x7007, 31)  # Сброс картинки слота 2
+        params["ART-2"] = {"type": None, "number": None}
+        #else:
+            #print("❌ Ячейка 2 уже пуста")
 
     else:
         print("❌ Неверный индекс ячейки (может быть только 0 или 1)")
