@@ -442,7 +442,7 @@ def art_efeckt(device_type):
                 jdy_send_queue.put(use_command)
                 print(use_command)
             break
-
+    int_write(0x7005, 31)
 def apply_effect(rad=0, psy=0, regen=0, anom=0, rd=0):
     global rad_stat, psy_stat, regen_stat, anom_stat, RD_stat
     rad_stat += rad
@@ -525,13 +525,14 @@ def KDA(device_type, device_number):
         print(f"[ART] ⬅️ Добавлено в очередь: {message}")
     except Exception as e:
         print(f"[ART] ⚠️ Ошибка при добавлении в очередь: {e}")
-        
+
     try:
         with open("param.json", "w") as f:
             json.dump(params, f, indent=4)
             print("[ART] 💾 Слоты сохранены в param.json")
     except Exception as e:
         print(f"[ART] ⚠️ Ошибка при сохранении param.json: {e}")
+    int_write(0x7005, 31)    
 
 def DELL(index):
     global active_arts
