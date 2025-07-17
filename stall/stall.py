@@ -516,7 +516,7 @@ def KDA(device_type, device_number):
 
     # Подготовка и отправка команды сохранения
     message = f"KDA {number_pda} {last_device_type}{last_device_number}save"
-    print(f"[ART] 📡 Подготовлено к отправке: {message}")
+    #print(f"[ART] 📡 Подготовлено к отправке: {message}")
 
     try:
         jdy_send_queue.put(message)
@@ -622,7 +622,33 @@ def main():
     regen = params["Regen"]
     active_arts[0] = (params["ART-1"]["type"], params["ART-1"]["number"])
     active_arts[1] = (params["ART-2"]["type"], params["ART-2"]["number"])
-          
+    # Обновляем картинки на дисплее для ART-1 и ART-2, если заданы
+    image_map = {
+        "COMPAS": 3,
+        "BATARY": 13,
+        "KAPLYA": 7,
+        "BUBBLE": 6,
+        "FLAME": 9,
+        "JOKER": 15,
+        "GOLD": 18,
+        "SHADOW": 11,
+        "STORM": 17,
+        "CRYSTAL": 5
+        }
+
+    if active_arts[0] and active_arts[0][0] in image_map:
+        img_code1 = image_map[active_arts[0][0]]
+        int_write(0x7006, img_code1)
+        print(f"[BOOT] ✅ Слот 1 восстановлен: {active_arts[0][0]}{active_arts[0][1]} → {img_code1}")
+
+    if active_arts[1] and active_arts[1][0] in image_map:
+        img_code2 = image_map[active_arts[1][0]]
+        int_write(0x7007, img_code2)
+        print(f"[BOOT] ✅ Слот 2 восстановлен: {active_arts[1][0]}{active_arts[1][1]} → {img_code2}")
+
+
+
+
 
     for med in params.get("Medicina", []):
         if med["name"] == "B190":
