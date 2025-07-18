@@ -295,7 +295,7 @@ def update_hp_rd(HP, RD):
     print(f"[DEBUG] update_hp_rd: orig_HP={orig_HP}, orig_RD={orig_RD}, new_HP={HP}, new_RD={RD}, changed={changed}")
     return HP, RD, changed, send_packets
 
-def radic(send_packets):
+def radic():
     global RD, HP, flag_radic, arm_rad, block_rad, rad_stat, RD_stat
     if not block_rad:
         flag_radic = True
@@ -311,7 +311,7 @@ def radic(send_packets):
         else:
             RD += 100
             HP -= 50
-        send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0xA0, 0x01, 0x01, 0x40, 0x00]))    
+        #send_packets.append(bytes([0x5A, 0xA5, 0x07, 0x82, 0x00, 0xA0, 0x01, 0x01, 0x40, 0x00]))    
 
 def art_type(device_type):
     global last_device_type
