@@ -104,10 +104,10 @@ uart.current_nik = current_nik
 uart.params = params
 
 
-jdy_port = "/dev/ttyUSB0"
+jdy_port = "/dev/ttyUSB0" #USB
 jdy_baud = 9600
 jdy_ser = serial.Serial(jdy_port, baudrate=jdy_baud, timeout=0.1)
-serial_port = "/dev/ttyS5"
+serial_port = "/dev/ttyS5" #Tx-RX
 baud_rate = 115200
 VERS_PATH = "/home/orangepi/PDA/vers.txt"
 
