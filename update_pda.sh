@@ -1,5 +1,5 @@
 #!/bin/bash
-pkill -f stall.py                  # Остановить stall.py, если работает
+pkill -f stall.py          
 sleep 3
 
 REPO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -43,7 +43,6 @@ if [ "$LOCAL_VERSION" != "$REMOTE_VERSION" ]; then
 else
     echo "✅ Уже последняя версия."
 
-    # Запускаем основной скрипт, если нужно
     
     echo "🚀 Запуск stall.py..."
     #exec python3 "$REPO_DIR/stall/stall.py"
